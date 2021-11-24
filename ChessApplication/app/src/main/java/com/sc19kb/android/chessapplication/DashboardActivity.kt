@@ -27,5 +27,10 @@ class DashboardActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+
+        play_btn.setOnClickListener {
+            startActivity(Intent(this , LobbyActivity::class.java))
+        }
+
     }
 }

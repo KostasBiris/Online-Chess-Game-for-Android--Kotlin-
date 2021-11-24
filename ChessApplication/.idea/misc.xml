@@ -9,7 +9,8 @@
         <entry key="app/src/main/res/drawable/ic_signin_background.xml" value="0.14444444444444443" />
         <entry key="app/src/main/res/layout-w1240dp/activity_login.xml" value="0.1" />
         <entry key="app/src/main/res/layout-w936dp/activity_login.xml" value="0.13064269319051264" />
-        <entry key="app/src/main/res/layout/activity_dashboard.xml" value="0.35572916666666665" />
+        <entry key="app/src/main/res/layout/activity_dashboard.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_lobby.xml" value="0.19427083333333334" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.17299898682877407" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.5" />
         <entry key="app/src/main/res/layout/activity_sign_in.xml" value="0.35572916666666665" />
