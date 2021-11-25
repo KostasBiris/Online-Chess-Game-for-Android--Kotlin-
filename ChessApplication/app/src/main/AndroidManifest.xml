@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ChessApplication">
         <activity
+            android:name=".LobbyActivity"
+            android:exported="true" />
+        <activity
+            android:name=".GameActivity"
+            android:exported="true" />
+        <activity
             android:name=".DashboardActivity"
             android:exported="true" />
         <activity
