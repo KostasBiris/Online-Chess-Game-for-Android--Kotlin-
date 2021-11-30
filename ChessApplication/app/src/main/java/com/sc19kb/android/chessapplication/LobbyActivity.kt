@@ -24,6 +24,7 @@ class LobbyActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lobby)
 
+//--------- Create Match : [Start] ------------------------------
         Create.setOnClickListener{
             matchName = "null"
             matchNameFound = false
@@ -38,12 +39,14 @@ class LobbyActivity : AppCompatActivity() {
             if(matchName != "null" && matchName != "") {
 
                 isMatchMaker = true
+                //Adds the new game match on the "matches" table in the database
                 FirebaseDatabase.getInstance().reference.child("matches").addValueEventListener(object  :ValueEventListener{
                     override fun onCancelled(error: DatabaseError) {
                         TODO("Not yet implemented")
                     }
 
                     override fun onDataChange(snapshot: DataSnapshot) {
+                        //Check if a match with the same name exists
                         val check = isValueAvailable(snapshot , matchName)
 
                         Handler().postDelayed({
@@ -55,6 +58,8 @@ class LobbyActivity : AppCompatActivity() {
                                 progressBar.visibility = View.GONE
 
                             }
+
+                            //Create new match and wait for the game to begin
                             else{
                                 FirebaseDatabase.getInstance().reference.child("matches").push().setValue(matchName)
                                 isValueAvailable(snapshot,matchName)
@@ -73,6 +78,8 @@ class LobbyActivity : AppCompatActivity() {
 
                 })
             }
+
+            // Executes if a wrong match name is entered
             else
             {
                 Create.visibility = View.VISIBLE
@@ -83,12 +90,17 @@ class LobbyActivity : AppCompatActivity() {
                 errorMsg("Enter Match Name Properly")
             }
         }
+//--------- Create Match : [End] ------------------------------
+
+//--------- Join Match : [Start] ------------------------------
         Join.setOnClickListener{
             matchName = "null"
             matchNameFound = false
             checkTemp = true
             keyValue= "null"
             matchName = MatchName.text.toString()
+
+            //find match
             if(matchName != "null" && matchName != "") {
                 Create.visibility = View.GONE
                 Join.visibility = View.GONE
@@ -138,6 +150,7 @@ class LobbyActivity : AppCompatActivity() {
         }
 
     }
+//--------- Join Match : [End] ------------------------------
 
     fun accepted() {
         startActivity(Intent(this, GameActivity::class.java))
