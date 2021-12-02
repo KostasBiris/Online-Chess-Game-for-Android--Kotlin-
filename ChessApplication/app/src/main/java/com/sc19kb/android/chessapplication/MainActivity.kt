@@ -1,21 +1,25 @@
 package com.sc19kb.android.chessapplication
 
-import android.content.Intent
+/*
+*----------- MAIN ACTIVITY ----------
+*
+* Contains the splash screen that navigates
+* the user to the Sign-In Activity and
+* from there to the Dashboard Activity
+*/
+
+
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 
 private  const val  TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
 
-    var chessModel = ChessModel()
+    var chessModel = ChessBoardConsole()
 
     //database instance
     private var database= FirebaseDatabase.getInstance()

@@ -1,5 +1,20 @@
 package com.sc19kb.android.chessapplication
 
+/*
+ * ------------------ MAIN GAME --------------------
+ *
+ * This is where the two users get directed after
+ * joining the game match with the same name from the Lobby
+ *
+ * For now its only functionality is to change the colour
+ * and number on a screen button every time the users click on it
+ *
+ * First user to click on it five (5) times is crowned the winner.
+ *
+ * Will be replaced by an actual chess game.
+ *
+ */
+
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -16,22 +31,6 @@ import kotlinx.android.synthetic.main.activity_game.*
 import kotlin.system.exitProcess
 
 var isMyMove = isMatchMaker
-
-/*
- * MAIN GAME
- *
- * This is where the two users get directed after
- * joining the game match with the same name from the Lobby
- *
- * For now its only functionality is to change the colour
- * and number on a screen button every time the users click on it
- *
- * First user to click on it five (5) times is crowned the winner.
- *
- * Will be replaced by an actual chess game.
- *
- */
-
 
 
 class GameActivity : AppCompatActivity() {
@@ -78,7 +77,7 @@ class GameActivity : AppCompatActivity() {
         })
     }
     
-    //Count the number of times each player
+    //Count the number of times each army
     //has clicked on the button
     private var p1MoveCount = 0
     private var p2MoveCount = 0
