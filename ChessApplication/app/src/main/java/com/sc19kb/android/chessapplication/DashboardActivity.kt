@@ -44,8 +44,14 @@ class DashboardActivity : AppCompatActivity() {
 
         // Play Chess
         play_btn.setOnClickListener {
-            startActivity(Intent(this , LobbyActivity::class.java))
+            //startActivity(Intent(this , LobbyActivity::class.java))
+
+            //val MainGameIntent = Intent(this, MainGame::class.java)
+            startActivity(Intent(this , MainGame::class.java))
+            finish()
         }
+
+
 
     }
 }
