@@ -1,6 +1,6 @@
 package com.sc19kb.android.chessapplication
 
 interface ChessInterface {
-    fun pieceAt(col: Int, row: Int) : ChessPiece?
-    fun movePiece(fromCol: Int, fromRow: Int, toCol: Int, toRow: Int)
+    fun pieceAt(column: Int, row: Int) : ChessPiece?
+    fun movePiece(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int)
 }

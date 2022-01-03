@@ -24,7 +24,7 @@ class ChessBoardConsole {
 
 
     fun movePiece(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int) {
-        
+
         // If we try to move the piece to square where it is already located
         if (curColumn == destColumn && curRow == destRow) return
 
@@ -77,9 +77,9 @@ class ChessBoardConsole {
     }
 
     // Returns the rank of the piece at a certain square, if there is a piece on that square
-    fun pieceAt(col: Int, row: Int) : ChessPiece? {
+    fun pieceAt(column: Int, row: Int) : ChessPiece? {
         for (piece in piecesSet) {
-            if (col == piece.col && row == piece.row) {
+            if (column == piece.column && row == piece.row) {
                 return piece
             }
         }
@@ -99,10 +99,10 @@ class ChessBoardConsole {
             boardString += "$row"
             
             // add every column in a row
-            for (col in 0..7) {
+            for (column in 0..7) {
 
                 // check if there is a piece on that square
-                val piece = pieceAt(col, row)
+                val piece = pieceAt(column, row)
 
                 // if there is no piece put a dot to indicate the empty square
                 if (piece == null) {

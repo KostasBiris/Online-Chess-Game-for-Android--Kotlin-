@@ -80,18 +80,18 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
         // When User touches the screen
         when (event.action) {
 
-            // When their finger is on the screen
+            // When user's finger is on the screen
             MotionEvent.ACTION_DOWN -> {
                 curColumn = ((event.x - startingX) / cellSize).toInt()
                 curRow = 7 - ((event.y - startingY) / cellSize).toInt()
             }
 
-            // When they lift their finger from the screen
+            // When the user lifts their finger from the screen
             MotionEvent.ACTION_UP -> {
-                val col = ((event.x - startingX) / cellSize).toInt()
+                val column = ((event.x - startingX) / cellSize).toInt()
                 val row = 7 - ((event.y - startingY) / cellSize).toInt()
-                Log.d(TAG, "from ($curColumn, $curRow) to ($col, $row)")
-                chessInterface?.movePiece(curColumn, curRow, col, row)
+                Log.d(TAG, "from ($curColumn, $curRow) to ($column, $row)")
+                chessInterface?.movePiece(curColumn, curRow, column, row)
             }
 
             // When they move their finger on the screen
@@ -108,23 +108,24 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
         // draw every piece in each row
         for (row in 0..7) {
             //draw every piece in each column in a row
-            for (col in 0..7) {
-                chessInterface?.pieceAt(col, row)?.let {
-                    if (it != selectedPiece) {
-                        drawPieceAt(canvas, col, row, it.resID)
-                    }
+            for (column in 0..7) {
+                if (row != curRow || column != curColumn){
+                    chessInterface?.pieceAt(column, row)?.let { drawPieceAt(canvas,column, row, it.resID) }
                 }
             }
         }
-        selectedPieceBitmap?.let {
-            canvas.drawBitmap(it, null, RectF(selectedPieceX - cellSize/2, selectedPieceY - cellSize/2,selectedPieceX + cellSize/2,selectedPieceY + cellSize/2), paint)
+
+        chessInterface?.pieceAt(curColumn, curRow)?.let {
+            val bitmap = bitmaps[it.resID]!!
+            canvas.drawBitmap(bitmap, null, RectF(selectedPieceX - cellSize/2, selectedPieceY - cellSize/2, selectedPieceX + cellSize/2,selectedPieceY + cellSize/2), paint)
         }
+        
     }
 
     // Draws a given piece inside a specified cell's borders
-    private fun drawPieceAt(canvas: Canvas, col: Int, row: Int, resID: Int) {
+    private fun drawPieceAt(canvas: Canvas, column: Int, row: Int, resID: Int) {
         val bitmap = bitmaps[resID]!!
-        canvas.drawBitmap(bitmap, null, RectF(startingX + col * cellSize,startingY + (7 - row) * cellSize,startingX + (col + 1) * cellSize,startingY + ((7 - row) + 1) * cellSize), paint)
+        canvas.drawBitmap(bitmap, null, RectF(startingX + column * cellSize,startingY + (7 - row) * cellSize,startingX + (column + 1) * cellSize,startingY + ((7 - row) + 1) * cellSize), paint)
     }
 
     private fun loadBitmaps() {
@@ -134,9 +135,9 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
     }
 
     // Draws a given piece inside a specified cell's borders
-    private fun drawSquareAt(canvas: Canvas, col: Int, row: Int, isBlack: Boolean) {
+    private fun drawSquareAt(canvas: Canvas, column: Int, row: Int, isBlack: Boolean) {
         paint.color = if (isBlack) paintBlack else paintWhite
-        canvas.drawRect(startingX + col * cellSize, startingY + row * cellSize, startingX + (col + 1)* cellSize, startingY + (row + 1) * cellSize, paint)
+        canvas.drawRect(startingX + column * cellSize, startingY + row * cellSize, startingX + (column + 1)* cellSize, startingY + (row + 1) * cellSize, paint)
     }
 
     // Draws the Chessboard background white and black squares
@@ -144,8 +145,8 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
         // draw every square in each row
         for (row in 0..7) {
             // draw every square in column in a row
-            for (col in 0..7) {
-                drawSquareAt(canvas, col, row, (col + row) % 2 == 1)
+            for (column in 0..7) {
+                drawSquareAt(canvas, column, row, (column + row) % 2 == 1)
             }
         }
     }
