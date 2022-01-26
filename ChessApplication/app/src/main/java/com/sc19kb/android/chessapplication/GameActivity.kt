@@ -257,6 +257,7 @@ class GameActivity : AppCompatActivity() {
     fun errorMsg(value : String){
         Toast.makeText(this , value  , Toast.LENGTH_SHORT).show()
     }
+
     private fun disableReset()
     {
         reset_btn.isEnabled = false

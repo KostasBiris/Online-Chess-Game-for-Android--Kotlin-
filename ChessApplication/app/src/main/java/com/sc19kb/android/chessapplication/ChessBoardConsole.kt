@@ -10,7 +10,7 @@ package com.sc19kb.android.chessapplication
 *
 */
 
-import android.util.Log
+import java.lang.Math.abs
 
 
 class ChessBoardConsole {
@@ -22,30 +22,190 @@ class ChessBoardConsole {
         reset()
     }
 
+//===============================================================================================
 
-    fun movePiece(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int) {
+    // Check if there is empty vertical space between the current square and the destination square.
+    private fun isGapVertically(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+        if (curColumn != destColumn) {
+            return false
+        }else{
+            2
+            val emptySquares = abs(curRow - destRow) - 1
 
-        // If we try to move the piece to square where it is already located
-        if (curColumn == destColumn && curRow == destRow) return
+            if (emptySquares == 0 ) return true
 
-        // Select the piece you want to move is located by getting it from its square
-        val selectedPiece = pieceAt(curColumn, curRow) ?: return
+            for (i in 1..emptySquares) {
+                val nextRow = when {
+                    destRow > curRow -> curRow + i
+                    else -> curRow - i
+                }
 
-        pieceAt(destColumn, destRow)?.let {
-            if (it.army == selectedPiece.army) {
-                return
+                if (pieceAt(curColumn, nextRow) != null) {
+                    return false
+                }
             }
-            piecesSet.remove(it)
+            return true
         }
 
-        // If there is an enemy piece in that square, remove it and put
-        // the selected piece in that square
-        piecesSet.remove(selectedPiece)
-        piecesSet.add(ChessPiece(destColumn, destRow, selectedPiece.army, selectedPiece.rank, selectedPiece.resID))
+    }
+
+    // Check if there is empty horizontal space between the current square and the destination square.
+    private fun isGapHorizontally(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+        if (curRow != destRow) return false
+
+        val emptySquares = abs(curColumn - destColumn) - 1
+
+        if (emptySquares == 0 ) return true
+
+        for (i in 1..emptySquares) {
+            val nextColumn = when {
+                destColumn > curColumn -> curColumn + i
+                else -> curColumn - i
+            }
+
+            if (pieceAt(nextColumn, curRow) != null) {
+                return false
+            }
+        }
+        return true
+    }
+
+    // Check if there is empty diagonal space between the current square and the destination square.
+    private fun isGapDiagonally(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+
+        if (abs(curColumn - destColumn) != abs(curRow - destRow)) return false
+
+        val emptySquares = abs(curColumn - destColumn) - 1
+
+        for (i in 1..emptySquares) {
+            val nextColumn = when {
+                destColumn > curColumn -> curColumn + i
+                else -> curColumn - i
+            }
+
+            val nextRow = when {
+                destRow > curRow -> curRow + i
+                else -> curRow - i
+            }
+
+            if (pieceAt(nextColumn, nextRow) != null) {
+                return false
+            }
+        }
+        return true
+    }
+
+    // Pawns can only move one Square forward but are able to move two Squares on their first move.
+    private fun canPawnMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+        if (curColumn == destColumn) {
+            if (curRow == 1) {
+                return destRow == 2 || destRow == 3
+
+            }else if (!isGapDiagonally(curColumn, curRow, destColumn, destRow)){
+                return destRow == curRow+1 && (destColumn == curColumn-1 || destColumn == curColumn+1)
+
+            }else{
+                return destRow == curRow+1 || destRow == curRow-1
+            }
+        }
+        return false
+    }
+
+    // Knights can only move in an L from their current square.
+    private fun canKnightMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+        return abs(curColumn - destColumn) == 2 && abs(curRow - destRow) == 1 ||
+                abs(curColumn - destColumn) == 1 && abs(curRow - destRow) == 2
+    }
+
+    // Rooks can only move vertically in the same column or horizontally in the same row as their current square.
+    private fun canRookMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+        return curColumn == destColumn && isGapVertically(curColumn, curRow, destColumn, destRow) ||
+                curRow == destRow && isGapHorizontally(curColumn, curRow, destColumn, destRow)
+    }
+
+
+    // Bishops can only move diagonally.
+    private fun canBishopMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+        if (abs(curColumn - destColumn) == abs(curRow - destRow)) {
+            return isGapDiagonally(curColumn, curRow, destColumn, destRow)
+
+        }else{
+            return false
+        }
+    }
+
+    // Queens can move vertically, horizontally and diagonally.
+    private fun canQueenMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+        return canRookMove(curColumn, curRow, destColumn, destRow) || canBishopMove(curColumn, curRow, destColumn, destRow)
+    }
+
+    // Kings can only move one square vertically, horizontally or diagonally.
+    private fun canKingMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+        if (canQueenMove(curColumn, curRow, destColumn, destRow)) {
+            return abs(curColumn - destColumn) == 1 && abs(curRow - destRow) == 1 || abs(curColumn - destColumn) + abs(curRow - destRow) == 1
+        }else{
+            return false
+        }
+    }
+
+
+
+    fun canMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+        if (curColumn == destColumn && curRow == destRow) {
+            return false
+        }
+
+        val movingPiece = pieceAt(curColumn, curRow) ?: return false
+
+        return when(movingPiece.rank) {
+            ChessRank.PAWN -> canPawnMove(curColumn, curRow, destColumn, destRow)
+            ChessRank.ROOK -> canRookMove(curColumn, curRow, destColumn, destRow)
+            ChessRank.KNIGHT -> canKnightMove(curColumn, curRow, destColumn, destRow)
+            ChessRank.BISHOP -> canBishopMove(curColumn, curRow, destColumn, destRow)
+            ChessRank.QUEEN -> canQueenMove(curColumn, curRow, destColumn, destRow)
+            ChessRank.KING -> canKingMove(curColumn, curRow, destColumn, destRow)
+
+        }
+    }
+//===============================================================================================
+
+    // Returns the rank of the piece at a certain square, if there is a piece on that square
+    fun pieceAt(column: Int, row: Int) : ChessPiece? {
+        for (piece in piecesSet) {
+            if (column == piece.column && row == piece.row) {
+                return piece
+            }
+        }
+        return null
+    }
+
+    fun movePiece(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int) {
+        if (canMove(curColumn, curRow, destColumn, destRow)){
+            // If we try to move the piece to square where it is already located
+            if (curColumn == destColumn && curRow == destRow) return
+
+            // Select the piece you want to move is located by getting it from its square
+            val selectedPiece = pieceAt(curColumn, curRow) ?: return
+
+            pieceAt(destColumn, destRow)?.let {
+                if (it.army == selectedPiece.army) {
+                    return
+                }
+                piecesSet.remove(it)
+            }
+
+            // If there is an enemy piece in that square, remove it and put
+            // the selected piece in that square
+            piecesSet.remove(selectedPiece)
+            piecesSet.add(ChessPiece(destColumn, destRow, selectedPiece.army, selectedPiece.rank, selectedPiece.resID))
+
+        }else{
+            return
+        }
+
 
     }
-    
-    
+
     private fun reset() {
         // Clear the Chessboard before re-arranging the pieces
         piecesSet.removeAll(piecesSet)
@@ -76,15 +236,7 @@ class ChessBoardConsole {
         }
     }
 
-    // Returns the rank of the piece at a certain square, if there is a piece on that square
-    fun pieceAt(column: Int, row: Int) : ChessPiece? {
-        for (piece in piecesSet) {
-            if (column == piece.column && row == piece.row) {
-                return piece
-            }
-        }
-        return null
-    }
+
 
 
 
