@@ -29,7 +29,6 @@ class ChessBoardConsole {
         if (curColumn != destColumn) {
             return false
         }else{
-            2
             val emptySquares = abs(curRow - destRow) - 1
 
             if (emptySquares == 0 ) return true
@@ -95,37 +94,86 @@ class ChessBoardConsole {
         return true
     }
 
-    // Pawns can only move one Square forward but are able to move two Squares on their first move.
-    private fun canPawnMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
-        if (curColumn == destColumn) {
-            if (curRow == 1) {
-                return destRow == 2 || destRow == 3
+    // En-passant is a move executed by pawns, where they capture the enemy pawn by going behind it.
+    private fun enPassant(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean{
+        if (curColumn != 4 && army == ChessArmy.WHITE){
+            return false
 
-            }else if (!isGapDiagonally(curColumn, curRow, destColumn, destRow)){
-                return destRow == curRow+1 && (destColumn == curColumn-1 || destColumn == curColumn+1)
+        }else if(curColumn != 3 && army == ChessArmy.BLACK){
+            return false
+        }
 
+        if (pieceAt(destColumn, destRow) == null){
+
+            if((destColumn == curColumn+1 || destColumn == curColumn-1) && pieceAt(destColumn, destRow-1)!=null){
+                var enemyPiece = pieceAt(destColumn, destRow-1)
+
+                if (enemyPiece != null) {
+                    when {
+                        enemyPiece.army == army -> {
+                            return false
+                        }
+                        enemyPiece.rank != ChessRank.PAWN -> {
+                            return false
+                        }
+                        else -> {
+                            if (army == ChessArmy.WHITE){
+                                piecesSet.remove(pieceAt(destColumn,destRow+1))
+
+                            }else if (army == ChessArmy.BLACK){
+                                piecesSet.remove(pieceAt(destColumn,destRow-1))
+                            }
+
+                            return true
+                        }
+                    }
+                }
             }else{
-                return destRow == curRow+1 || destRow == curRow-1
-            }
+                return false
+                            }
         }
         return false
     }
 
-    // Knights can only move in an L from their current square.
-    private fun canKnightMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
-        return abs(curColumn - destColumn) == 2 && abs(curRow - destRow) == 1 ||
-                abs(curColumn - destColumn) == 1 && abs(curRow - destRow) == 2
+
+
+    // Pawns can only move one Square forward but are able to move two Squares on their first move.
+    private fun canPawnMove(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+        if (curColumn == destColumn) {
+            if (curRow == 1 && army == ChessArmy.WHITE && pieceAt(curColumn, destRow) == null) // First move of a White pawn.
+                return destRow == 2 || destRow == 3
+            if (curRow == 6 && army == ChessArmy.BLACK && pieceAt(curColumn, destRow) == null) // First move of a Black pawn.
+                return destRow == 5 || destRow == 4
+            if ((army == ChessArmy.WHITE && destRow ==1+ curRow && pieceAt(destColumn,destRow) == null) //move one square forward.
+                 || (army == ChessArmy.BLACK && destRow == -1+ curRow) && pieceAt(destColumn,destRow) == null) return true
+
+        // Captures with White pawn.
+        }else if (army == ChessArmy.WHITE && abs(destColumn - curColumn) ==1 && destRow == curRow+1) {
+            if (pieceAt(destColumn, destRow) != null) return true // Simple diagonal capture
+            else if (enPassant(army, curColumn, curRow, destColumn, destRow)) return true // En-passant
+
+        // Captures with Black pawn.
+        }else if(army == ChessArmy.BLACK && abs(destColumn - curColumn) ==1 && destRow == curRow-1) {
+            if (pieceAt(destColumn, destRow) != null) return true // Simple diagonal capture
+            else if (enPassant(army, curColumn, curRow, destColumn, destRow)) return true // En-passant
+        }
+        return false
     }
 
     // Rooks can only move vertically in the same column or horizontally in the same row as their current square.
-    private fun canRookMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+    private fun canRookMove(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
         return curColumn == destColumn && isGapVertically(curColumn, curRow, destColumn, destRow) ||
                 curRow == destRow && isGapHorizontally(curColumn, curRow, destColumn, destRow)
     }
 
+    // Knights can only move in an L from their current square.
+    private fun canKnightMove(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+        return abs(curColumn - destColumn) == 2 && abs(curRow - destRow) == 1 ||
+                abs(curColumn - destColumn) == 1 && abs(curRow - destRow) == 2
+    }
 
     // Bishops can only move diagonally.
-    private fun canBishopMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+    private fun canBishopMove(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
         if (abs(curColumn - destColumn) == abs(curRow - destRow)) {
             return isGapDiagonally(curColumn, curRow, destColumn, destRow)
 
@@ -135,19 +183,18 @@ class ChessBoardConsole {
     }
 
     // Queens can move vertically, horizontally and diagonally.
-    private fun canQueenMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
-        return canRookMove(curColumn, curRow, destColumn, destRow) || canBishopMove(curColumn, curRow, destColumn, destRow)
+    private fun canQueenMove(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+        return canRookMove(army, curColumn, curRow, destColumn, destRow) || canBishopMove(army, curColumn, curRow, destColumn, destRow)
     }
 
     // Kings can only move one square vertically, horizontally or diagonally.
-    private fun canKingMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
-        if (canQueenMove(curColumn, curRow, destColumn, destRow)) {
+    private fun canKingMove(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+        if (canQueenMove(army, curColumn, curRow, destColumn, destRow)) {
             return abs(curColumn - destColumn) == 1 && abs(curRow - destRow) == 1 || abs(curColumn - destColumn) + abs(curRow - destRow) == 1
         }else{
             return false
         }
     }
-
 
 
     fun canMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
@@ -158,12 +205,12 @@ class ChessBoardConsole {
         val movingPiece = pieceAt(curColumn, curRow) ?: return false
 
         return when(movingPiece.rank) {
-            ChessRank.PAWN -> canPawnMove(curColumn, curRow, destColumn, destRow)
-            ChessRank.ROOK -> canRookMove(curColumn, curRow, destColumn, destRow)
-            ChessRank.KNIGHT -> canKnightMove(curColumn, curRow, destColumn, destRow)
-            ChessRank.BISHOP -> canBishopMove(curColumn, curRow, destColumn, destRow)
-            ChessRank.QUEEN -> canQueenMove(curColumn, curRow, destColumn, destRow)
-            ChessRank.KING -> canKingMove(curColumn, curRow, destColumn, destRow)
+            ChessRank.PAWN -> canPawnMove(movingPiece.army, curColumn, curRow, destColumn, destRow)
+            ChessRank.ROOK -> canRookMove(movingPiece.army, curColumn, curRow, destColumn, destRow)
+            ChessRank.KNIGHT -> canKnightMove(movingPiece.army, curColumn, curRow, destColumn, destRow)
+            ChessRank.BISHOP -> canBishopMove(movingPiece.army, curColumn, curRow, destColumn, destRow)
+            ChessRank.QUEEN -> canQueenMove(movingPiece.army, curColumn, curRow, destColumn, destRow)
+            ChessRank.KING -> canKingMove(movingPiece.army, curColumn, curRow, destColumn, destRow)
 
         }
     }
