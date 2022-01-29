@@ -10,7 +10,18 @@ package com.sc19kb.android.chessapplication
 *
 */
 
+import android.util.Log
 import java.lang.Math.abs
+
+var round:ChessArmy = ChessArmy.WHITE
+
+//Special move flags
+var whiteEnPassantFlag: Int = -1
+var blackEnPassantFlag: Int = -1
+var whiteRightCastleFlag: Boolean = true
+var whiteLeftCastleFlag: Boolean = true
+var blackRightCastleFlag: Boolean = true
+var blackLeftCastleFlag: Boolean = true
 
 
 class ChessBoardConsole {
@@ -96,56 +107,48 @@ class ChessBoardConsole {
 
     // En-passant is a move executed by pawns, where they capture the enemy pawn by going behind it.
     private fun enPassant(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean{
-        if (curColumn != 4 && army == ChessArmy.WHITE){
+        if (army==ChessArmy.WHITE && blackEnPassantFlag!=destColumn || army==ChessArmy.BLACK && whiteEnPassantFlag!=destColumn) return false
+        if ((curRow != 4 && army == ChessArmy.WHITE) || (curRow != 3 && army == ChessArmy.BLACK)) return false
+        if (pieceAt(destColumn, destRow) == null) {
+            var enemyPiece = pieceAt(destColumn, destRow - 1)
+            if (army == ChessArmy.BLACK) enemyPiece = pieceAt(destColumn, destRow + 1)
+            if (abs(destColumn - curColumn) == 1 && enemyPiece != null) {
+                if (enemyPiece.army == army) return false
+                if (enemyPiece.rank != ChessRank.PAWN) return false
+
+                piecesSet.remove(enemyPiece)
+
+                return true
+            }
             return false
-
-        }else if(curColumn != 3 && army == ChessArmy.BLACK){
-            return false
-        }
-
-        if (pieceAt(destColumn, destRow) == null){
-
-            if((destColumn == curColumn+1 || destColumn == curColumn-1) && pieceAt(destColumn, destRow-1)!=null){
-                var enemyPiece = pieceAt(destColumn, destRow-1)
-
-                if (enemyPiece != null) {
-                    when {
-                        enemyPiece.army == army -> {
-                            return false
-                        }
-                        enemyPiece.rank != ChessRank.PAWN -> {
-                            return false
-                        }
-                        else -> {
-                            if (army == ChessArmy.WHITE){
-                                piecesSet.remove(pieceAt(destColumn,destRow+1))
-
-                            }else if (army == ChessArmy.BLACK){
-                                piecesSet.remove(pieceAt(destColumn,destRow-1))
-                            }
-
-                            return true
-                        }
-                    }
-                }
-            }else{
-                return false
-                            }
         }
         return false
     }
+
+    private fun Castle(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean{
+        if (pieceAt(curColumn, curRow) != null){
+
+        }
+    }
+
+
 
 
 
     // Pawns can only move one Square forward but are able to move two Squares on their first move.
     private fun canPawnMove(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
         if (curColumn == destColumn) {
-            if (curRow == 1 && army == ChessArmy.WHITE && pieceAt(curColumn, destRow) == null) // First move of a White pawn.
+           // val p = pieceAt(curColumn, curRow)
+            if (curRow == 1 && army == ChessArmy.WHITE && pieceAt(curColumn, destRow) == null) { // First move of a White pawn.
+                if(destRow == 3) whiteEnPassantFlag = destColumn //passantable
                 return destRow == 2 || destRow == 3
-            if (curRow == 6 && army == ChessArmy.BLACK && pieceAt(curColumn, destRow) == null) // First move of a Black pawn.
+            }
+            if (curRow == 6 && army == ChessArmy.BLACK && pieceAt(curColumn, destRow) == null) { // First move of a Black pawn.
+                if(destRow == 4) blackEnPassantFlag = destColumn //passantable
                 return destRow == 5 || destRow == 4
-            if ((army == ChessArmy.WHITE && destRow ==1+ curRow && pieceAt(destColumn,destRow) == null) //move one square forward.
-                 || (army == ChessArmy.BLACK && destRow == -1+ curRow) && pieceAt(destColumn,destRow) == null) return true
+            }
+            if ((army == ChessArmy.WHITE && destRow == curRow+1 && pieceAt(destColumn,destRow) == null) //move one square forward.
+                 || (army == ChessArmy.BLACK && destRow == curRow-1) && pieceAt(destColumn,destRow) == null) return true
 
         // Captures with White pawn.
         }else if (army == ChessArmy.WHITE && abs(destColumn - curColumn) ==1 && destRow == curRow+1) {
@@ -198,11 +201,14 @@ class ChessBoardConsole {
 
 
     fun canMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+
         if (curColumn == destColumn && curRow == destRow) {
             return false
         }
 
-        val movingPiece = pieceAt(curColumn, curRow) ?: return false
+        val movingPiece = pieceAt(curColumn, curRow)
+        if (movingPiece == null) return false
+        if (movingPiece.army != round) return false
 
         return when(movingPiece.rank) {
             ChessRank.PAWN -> canPawnMove(movingPiece.army, curColumn, curRow, destColumn, destRow)
@@ -246,11 +252,20 @@ class ChessBoardConsole {
             piecesSet.remove(selectedPiece)
             piecesSet.add(ChessPiece(destColumn, destRow, selectedPiece.army, selectedPiece.rank, selectedPiece.resID))
 
-        }else{
-            return
-        }
+            // Change Round
+            for (p in piecesSet)
+                if (p.army != round && p.rank == ChessRank.PAWN) p.hasMoved = false
 
+            if(round == ChessArmy.WHITE) {
+                round = ChessArmy.BLACK
+                blackEnPassantFlag = -1
+            }
+            else if (round == ChessArmy.BLACK) {
+                round = ChessArmy.WHITE
+                whiteEnPassantFlag = -1
+            }
 
+        }else {return}
     }
 
     private fun reset() {
@@ -282,9 +297,6 @@ class ChessBoardConsole {
             piecesSet.add(ChessPiece(i, 6, ChessArmy.BLACK, ChessRank.PAWN, R.drawable.pawn_black))
         }
     }
-
-
-
 
 
     // Turns the chess board into a printable string
