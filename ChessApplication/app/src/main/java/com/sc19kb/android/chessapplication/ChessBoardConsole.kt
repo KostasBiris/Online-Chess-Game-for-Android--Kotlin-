@@ -125,11 +125,33 @@ class ChessBoardConsole {
         return false
     }
 
-    private fun Castle(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean{
-        if (pieceAt(curColumn, curRow) != null){
+    private fun Castle(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int, leftCastle: Boolean): Boolean{
+        piecesSet.remove(pieceAt(curColumn, curRow))
+        piecesSet.remove(pieceAt(destColumn, destRow))
+        // Left Castle
+        if (leftCastle) {
+            if(army==ChessArmy.WHITE) {
+                piecesSet.add(ChessPiece(2, 0, ChessArmy.WHITE, ChessRank.KING, R.drawable.king_white))
+                piecesSet.add(ChessPiece(3, 0, ChessArmy.WHITE, ChessRank.ROOK, R.drawable.rook_white))
 
+            }else{
+                piecesSet.add(ChessPiece(2, 7, ChessArmy.BLACK, ChessRank.KING, R.drawable.king_black))
+                piecesSet.add(ChessPiece(3, 7, ChessArmy.BLACK, ChessRank.ROOK, R.drawable.rook_black))
+            }
+        // Right Castle
+        }else{
+            if(army==ChessArmy.WHITE) {
+                piecesSet.add(ChessPiece(6, 0, ChessArmy.WHITE, ChessRank.KING, R.drawable.king_white))
+                piecesSet.add(ChessPiece(5, 0, ChessArmy.WHITE, ChessRank.ROOK, R.drawable.rook_white))
+
+            }else{
+                piecesSet.add(ChessPiece(6, 7, ChessArmy.BLACK, ChessRank.KING, R.drawable.king_black))
+                piecesSet.add(ChessPiece(5, 7, ChessArmy.BLACK, ChessRank.ROOK, R.drawable.rook_black))
+            }
         }
+        return true
     }
+
 
 
 
@@ -165,8 +187,13 @@ class ChessBoardConsole {
 
     // Rooks can only move vertically in the same column or horizontally in the same row as their current square.
     private fun canRookMove(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
-        return curColumn == destColumn && isGapVertically(curColumn, curRow, destColumn, destRow) ||
+        var y:Boolean =  curColumn == destColumn && isGapVertically(curColumn, curRow, destColumn, destRow) ||
                 curRow == destRow && isGapHorizontally(curColumn, curRow, destColumn, destRow)
+        if(y && army == ChessArmy.WHITE && curColumn == 0 && curRow==0) whiteLeftCastleFlag = false
+        if(y && army == ChessArmy.WHITE && curColumn == 7 && curRow==0) whiteRightCastleFlag = false
+        if(y && army == ChessArmy.BLACK && curColumn == 0 && curRow==7) blackLeftCastleFlag = false
+        if(y && army == ChessArmy.BLACK && curColumn == 7 && curRow==7) blackRightCastleFlag = false
+        return y
     }
 
     // Knights can only move in an L from their current square.
@@ -192,6 +219,42 @@ class ChessBoardConsole {
 
     // Kings can only move one square vertically, horizontally or diagonally.
     private fun canKingMove(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+     //white left castling
+        if (army == ChessArmy.WHITE && whiteLeftCastleFlag){
+            if (destColumn == 0 && destRow == 0 && isGapHorizontally(curColumn, curRow, destColumn, destRow)){
+                Castle(army, curColumn, curRow, destColumn, destRow, true)
+                whiteLeftCastleFlag = false
+                whiteRightCastleFlag = false
+                return false
+            }
+        }
+        if (army == ChessArmy.WHITE && whiteRightCastleFlag){
+            if (destColumn == 7 && destRow == 0 && isGapHorizontally(curColumn, curRow, destColumn, destRow)){
+                Castle(army, curColumn, curRow, destColumn, destRow, false)
+                whiteRightCastleFlag = false
+                whiteLeftCastleFlag = false
+                return false
+            }
+        }
+        if (army == ChessArmy.BLACK && blackLeftCastleFlag){
+            if (destColumn == 0 && destRow == 7 && isGapHorizontally(curColumn, curRow, destColumn, destRow)){
+                Castle(army, curColumn, curRow, destColumn, destRow, true)
+                blackLeftCastleFlag = false
+                blackRightCastleFlag = false
+                return false
+            }
+
+        }
+        if (army == ChessArmy.BLACK && blackRightCastleFlag){
+            if (destColumn == 7 && destRow == 7 && isGapHorizontally(curColumn, curRow, destColumn, destRow)){
+                Castle(army, curColumn, curRow, destColumn, destRow, false)
+                blackRightCastleFlag = false
+                blackLeftCastleFlag = false
+                return false
+            }
+
+        }
+
         if (canQueenMove(army, curColumn, curRow, destColumn, destRow)) {
             return abs(curColumn - destColumn) == 1 && abs(curRow - destRow) == 1 || abs(curColumn - destColumn) + abs(curRow - destRow) == 1
         }else{
