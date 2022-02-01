@@ -24,7 +24,7 @@ var blackRightCastleFlag: Boolean = true
 var blackLeftCastleFlag: Boolean = true
 
 
-class ChessBoardConsole {
+object ChessBoardConsole {
 
     var piecesSet = mutableSetOf<ChessPiece>()
 
@@ -106,7 +106,7 @@ class ChessBoardConsole {
     }
 
     // En-passant is a move executed by pawns, where they capture the enemy pawn by going behind it.
-    private fun enPassant(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean{
+    fun enPassant(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean{
         if (army==ChessArmy.WHITE && blackEnPassantFlag!=destColumn || army==ChessArmy.BLACK && whiteEnPassantFlag!=destColumn) return false
         if ((curRow != 4 && army == ChessArmy.WHITE) || (curRow != 3 && army == ChessArmy.BLACK)) return false
         if (pieceAt(destColumn, destRow) == null) {
@@ -158,7 +158,7 @@ class ChessBoardConsole {
 
 
     // Pawns can only move one Square forward but are able to move two Squares on their first move.
-    private fun canPawnMove(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+    fun canPawnMove(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
         if (curColumn == destColumn) {
            // val p = pieceAt(curColumn, curRow)
             if (curRow == 1 && army == ChessArmy.WHITE && pieceAt(curColumn, destRow) == null) { // First move of a White pawn.
@@ -331,7 +331,7 @@ class ChessBoardConsole {
         }else {return}
     }
 
-    private fun reset() {
+    fun reset() {
         // Clear the Chessboard before re-arranging the pieces
         piecesSet.removeAll(piecesSet)
 
@@ -366,7 +366,7 @@ class ChessBoardConsole {
     override fun toString(): String {
 
         //the String that contains the chessboard
-        var boardString = " \n"
+        var boardString = "\n"
         
         // add every row
         for (row in 7 downTo 0) {
