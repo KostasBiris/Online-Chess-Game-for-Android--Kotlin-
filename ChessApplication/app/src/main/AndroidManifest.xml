@@ -18,6 +18,9 @@
             android:name=".GameActivity"
             android:exported="true" />
         <activity
+            android:name=".MainGame"
+            android:exported="true" />
+        <activity
             android:name=".DashboardActivity"
             android:exported="true" />
         <activity
