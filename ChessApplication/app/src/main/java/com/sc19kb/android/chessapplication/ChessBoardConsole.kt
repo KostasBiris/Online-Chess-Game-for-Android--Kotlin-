@@ -125,7 +125,7 @@ object ChessBoardConsole {
         return false
     }
 
-    private fun Castle(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int, leftCastle: Boolean): Boolean{
+    fun Castle(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int, leftCastle: Boolean): Boolean{
         piecesSet.remove(pieceAt(curColumn, curRow))
         piecesSet.remove(pieceAt(destColumn, destRow))
         // Left Castle

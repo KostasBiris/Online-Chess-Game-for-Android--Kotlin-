@@ -39,11 +39,72 @@ class KingTest {
 
     @Test
     fun leftCastle_isCorrect() {
-        TODO("Implement")
+        ChessBoardConsole.piecesSet.removeAll(ChessBoardConsole.piecesSet)
+
+        ChessBoardConsole.piecesSet.add(ChessPiece(4, 0, ChessArmy.WHITE, ChessRank.KING, R.drawable.king_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(0, 0, ChessArmy.WHITE, ChessRank.ROOK, R.drawable.rook_white))
+        println(ChessBoardConsole)
+        whiteLeftCastleFlag = true
+        ChessBoardConsole.Castle(ChessArmy.WHITE, 4, 0, 0, 0, true)
+
+        assertNotNull(ChessBoardConsole.pieceAt(2, 0))
+        assertEquals(ChessArmy.WHITE, ChessBoardConsole.pieceAt(2, 0)?.army)
+        assertEquals(ChessRank.KING, ChessBoardConsole.pieceAt(2, 0)?.rank)
+
+        assertNotNull(ChessBoardConsole.pieceAt(3, 0))
+        assertEquals(ChessArmy.WHITE, ChessBoardConsole.pieceAt(3, 0)?.army)
+        assertEquals(ChessRank.ROOK, ChessBoardConsole.pieceAt(3, 0)?.rank)
+        println(ChessBoardConsole)
+
+        ChessBoardConsole.piecesSet.add(ChessPiece(4, 7, ChessArmy.BLACK, ChessRank.KING, R.drawable.king_black))
+        ChessBoardConsole.piecesSet.add(ChessPiece(0, 7, ChessArmy.BLACK, ChessRank.ROOK, R.drawable.rook_black))
+        println(ChessBoardConsole)
+        blackLeftCastleFlag = true
+        ChessBoardConsole.Castle(ChessArmy.BLACK, 4, 7, 0, 7, true)
+
+        assertNotNull(ChessBoardConsole.pieceAt(2, 7))
+        assertEquals(ChessArmy.BLACK, ChessBoardConsole.pieceAt(2, 7)?.army)
+        assertEquals(ChessRank.KING, ChessBoardConsole.pieceAt(2, 7)?.rank)
+
+        assertNotNull(ChessBoardConsole.pieceAt(3, 7))
+        assertEquals(ChessArmy.BLACK, ChessBoardConsole.pieceAt(3, 7)?.army)
+        assertEquals(ChessRank.ROOK, ChessBoardConsole.pieceAt(3, 7)?.rank)
+        println(ChessBoardConsole)
+
     }
 
     @Test
     fun rightCastle_isCorrect() {
-        TODO("Implement")
+        ChessBoardConsole.piecesSet.removeAll(ChessBoardConsole.piecesSet)
+
+        ChessBoardConsole.piecesSet.add(ChessPiece(4, 0, ChessArmy.WHITE, ChessRank.KING, R.drawable.king_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(7, 0, ChessArmy.WHITE, ChessRank.ROOK, R.drawable.rook_white))
+        println(ChessBoardConsole)
+        whiteRightCastleFlag = true
+        ChessBoardConsole.Castle(ChessArmy.WHITE, 4, 0, 7, 0, false)
+
+        assertNotNull(ChessBoardConsole.pieceAt(6, 0))
+        assertEquals(ChessArmy.WHITE, ChessBoardConsole.pieceAt(6, 0)?.army)
+        assertEquals(ChessRank.KING, ChessBoardConsole.pieceAt(6, 0)?.rank)
+
+        assertNotNull(ChessBoardConsole.pieceAt(5, 0))
+        assertEquals(ChessArmy.WHITE, ChessBoardConsole.pieceAt(5, 0)?.army)
+        assertEquals(ChessRank.ROOK, ChessBoardConsole.pieceAt(5, 0)?.rank)
+        println(ChessBoardConsole)
+
+        ChessBoardConsole.piecesSet.add(ChessPiece(4, 7, ChessArmy.BLACK, ChessRank.KING, R.drawable.king_black))
+        ChessBoardConsole.piecesSet.add(ChessPiece(7, 7, ChessArmy.BLACK, ChessRank.ROOK, R.drawable.rook_black))
+        println(ChessBoardConsole)
+        blackRightCastleFlag = true
+        ChessBoardConsole.Castle(ChessArmy.BLACK, 4, 7, 7, 7, false)
+
+        assertNotNull(ChessBoardConsole.pieceAt(6, 7))
+        assertEquals(ChessArmy.BLACK, ChessBoardConsole.pieceAt(6, 7)?.army)
+        assertEquals(ChessRank.KING, ChessBoardConsole.pieceAt(6, 7)?.rank)
+
+        assertNotNull(ChessBoardConsole.pieceAt(5, 7))
+        assertEquals(ChessArmy.BLACK, ChessBoardConsole.pieceAt(5, 7)?.army)
+        assertEquals(ChessRank.ROOK, ChessBoardConsole.pieceAt(5, 7)?.rank)
+        println(ChessBoardConsole)
     }
 }
