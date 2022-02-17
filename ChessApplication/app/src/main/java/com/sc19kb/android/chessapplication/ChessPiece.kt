@@ -7,4 +7,4 @@ package com.sc19kb.android.chessapplication
 * used to describe a certain chess piece
 */
 
-data class ChessPiece(val column: Int, val row: Int, val army: ChessArmy, val rank: ChessRank, val resID: Int, var hasMoved: Boolean = false)
+data class ChessPiece(var column: Int, var row: Int, var army: ChessArmy, var rank: ChessRank, var resID: Int)

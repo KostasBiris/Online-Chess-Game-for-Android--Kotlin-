@@ -5,12 +5,15 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.activity_lobby.*
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import java.io.PrintWriter
+import java.util.concurrent.Executors
 
 var isMatchMaker = true
 var matchName = "null"
@@ -23,6 +26,7 @@ class LobbyActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lobby)
+        val database = FirebaseDatabase.getInstance().getReference("Matches")
 
 //--------- Create Match : [Start] ------------------------------
         Create.setOnClickListener{
@@ -40,7 +44,7 @@ class LobbyActivity : AppCompatActivity() {
 
                 isMatchMaker = true
                 //Adds the new game match on the "matches" table in the database
-                FirebaseDatabase.getInstance().reference.child("matches").addValueEventListener(object  :ValueEventListener{
+                database.addValueEventListener(object  :ValueEventListener{
                     override fun onCancelled(error: DatabaseError) {
                         TODO("Not yet implemented")
                     }
@@ -61,7 +65,7 @@ class LobbyActivity : AppCompatActivity() {
 
                             //Create new match and wait for the game to begin
                             else{
-                                FirebaseDatabase.getInstance().reference.child("matches").push().setValue(matchName)
+                                database.push().setValue(matchName)
                                 isValueAvailable(snapshot,matchName)
                                 checkTemp = false
                                 Handler().postDelayed({
@@ -101,14 +105,14 @@ class LobbyActivity : AppCompatActivity() {
             matchName = MatchName.text.toString()
 
             //find match
-            if(matchName != "null" && matchName != "") {
+            if(matchName != "null" && !matchName.contains(" ")) {
                 Create.visibility = View.GONE
                 Join.visibility = View.GONE
                 MatchName.visibility = View.GONE
                 textView4.visibility = View.GONE
                 progressBar.visibility = View.VISIBLE
                 isMatchMaker = false
-                FirebaseDatabase.getInstance().reference.child("matches").addValueEventListener(object:ValueEventListener{
+                database.addValueEventListener(object:ValueEventListener{
                     override fun onCancelled(error: DatabaseError) {
                         TODO("Not yet implemented")
                     }
@@ -120,11 +124,11 @@ class LobbyActivity : AppCompatActivity() {
                             if(data) {
                                 matchNameFound = true
                                 accepted()
-                                Create.visibility = View.VISIBLE
-                                Join.visibility = View.VISIBLE
-                                MatchName.visibility = View.VISIBLE
-                                textView4.visibility = View.VISIBLE
-                                progressBar.visibility = View.GONE
+//                                Create.visibility = View.VISIBLE
+//                                Join.visibility = View.VISIBLE
+//                                MatchName.visibility = View.VISIBLE
+//                                textView4.visibility = View.VISIBLE
+//                                progressBar.visibility = View.GONE
                             }
                             else{
                                 Create.visibility = View.VISIBLE
@@ -154,12 +158,12 @@ class LobbyActivity : AppCompatActivity() {
 
     fun accepted() {
         startActivity(Intent(this, GameActivity::class.java))
-        Create.visibility = View.VISIBLE
-        Join.visibility = View.VISIBLE
-        MatchName.visibility = View.VISIBLE
-        textView4.visibility = View.VISIBLE
-        progressBar.visibility = View.GONE
-
+//        Create.visibility = View.VISIBLE
+//        Join.visibility = View.VISIBLE
+//        MatchName.visibility = View.VISIBLE
+//        textView4.visibility = View.VISIBLE
+//        progressBar.visibility = View.GONE
+        finish()
     }
 
     fun errorMsg(value : String){

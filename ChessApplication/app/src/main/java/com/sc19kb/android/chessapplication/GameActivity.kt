@@ -18,6 +18,7 @@ package com.sc19kb.android.chessapplication
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
@@ -28,20 +29,27 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_game.*
+import java.io.PrintWriter
 import kotlin.system.exitProcess
+import java.lang.Math.abs
+import java.util.concurrent.Executors
 
-var isMyMove = isMatchMaker
+
+class GameActivity : AppCompatActivity(), ChessInterface {
+    var isMyMove = isMatchMaker
+    val database = FirebaseDatabase.getInstance().getReference("Matches")
+    private lateinit var chessBoard: ChessBoard
+    private var printWriter: PrintWriter? = null
 
 
-class GameActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_game)
-        reset_btn.setOnClickListener {
-            reset()
-        }
+        setContentView(R.layout.activity_main_game)
+        chessBoard = findViewById<ChessBoard>(R.id.chess_board)
+        chessBoard.chessInterface = this
+
         //Connects to the Realtime Database on Firebase
-        FirebaseDatabase.getInstance().reference.child("data").child(matchName).addChildEventListener(object : ChildEventListener{
+        database.child(matchName).addChildEventListener(object : ChildEventListener{
             override fun onCancelled(error: DatabaseError) {
                 TODO("Not yet implemented")
             }
@@ -51,19 +59,19 @@ class GameActivity : AppCompatActivity() {
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
+                updateLocal()
             }
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val data = snapshot.value
-                if(isMyMove){
-                    isMyMove = false
-                    moveonline(data.toString() , isMyMove)
-                }
-                else{
-                    isMyMove = true
-                    moveonline(data.toString() , isMyMove)
-                }
+//                if(isMyMove){
+//                    isMyMove = false
+//                   // updateDatabase()
+//                }
+//                else{
+//                    isMyMove = true
+//                    updateLocal()
+//                }
 
 
 
@@ -73,165 +81,172 @@ class GameActivity : AppCompatActivity() {
                 reset()
                 errorMsg("Game Reset")
             }
-
         })
     }
-    
-    //Count the number of times each army
-    //has clicked on the button
-    private var p1MoveCount = 0
-    private var p2MoveCount = 0
-    
-    
-    // Function that runs when button is clicked
-    fun clickfun(view:View)
-    {
-        if(isMyMove) {
-            val but = view as Button
-            val cellOnline: Int = when (but.id) {
-                R.id.test_btn -> 1
-                else -> {
-                    0
+    // ===================================================================
+    override fun pieceAt(col: Int, row: Int): ChessPiece? {
+        return ChessBoardConsole.pieceAt(col, row)
+    }
+
+    override fun movePiece(fromCol: Int, fromRow: Int, toCol: Int, toRow: Int) {
+        if(isMyMove){
+            Log.d(TAG, "$fromCol,$fromRow,$toCol,$toRow")
+            ChessBoardConsole.movePiece(fromCol, fromRow, toCol, toRow)
+            chessBoard.invalidate()
+
+            printWriter?.let {
+                val moveStr = "$fromCol,$fromRow,$toCol,$toRow"
+                Executors.newSingleThreadExecutor().execute {
+                    it.println(moveStr)
                 }
-
             }
-            var playerTurn = false
-            Handler().postDelayed({ playerTurn = true }, 600)
-
-            playnow(but, cellOnline)
-            updateDatabase(cellOnline)
-
-        }
-        else{
+            updateDatabase()
+        }else{
             Toast.makeText(this , "Wait for your turn" , Toast.LENGTH_LONG).show()
         }
-    }
-    private var player1 = ArrayList<Int>()
-    private var player2 = ArrayList<Int>()
-    private var emptyCells = ArrayList<Int>()
-    private var activeUser = 1
 
-    private fun playnow(buttonSelected:Button, currCell:Int)
+    }
+    // ===================================================================
+    
+    // Function that runs when button is clicked
+//    fun clickfun(view:View)
+//    {
+//        if(isMyMove) {
+//            val but = view as Button
+//            val cellOnline: Int = when (but.id) {
+//                R.id.test_btn -> 1
+//                else -> {
+//                    0
+//                }
+//
+//            }
+//            var playerTurn = false
+//            Handler().postDelayed({ playerTurn = true }, 600)
+//
+//            playnow(but, cellOnline)
+//            updateDatabase(cellOnline)
+//
+//        }
+//        else{
+//            Toast.makeText(this , "Wait for your turn" , Toast.LENGTH_LONG).show()
+//        }
+//    }
+
+
+    private fun updateDatabase()
     {
-        buttonSelected.text = "1"
-        emptyCells.remove(currCell)
-        textView1.text = "Turn : Player 2"
-        p1MoveCount += 1
-        buttonSelected.setTextColor(Color.parseColor("#EC0C0C"))
-        player1.add(currCell)
-        emptyCells.add(currCell)
-
-        buttonSelected.isEnabled = true
-
-        checkwinner()
+        database.child(matchName).child("Board String").push().setValue(ChessBoardConsole.toString())
+        database.child(matchName).child("White EnPassant Flag").push().setValue(ChessBoardConsole.whiteEnPassantFlag)
+        database.child(matchName).child("Black EnPassant Flag").push().setValue(ChessBoardConsole.blackEnPassantFlag)
+        database.child(matchName).child("White Right Castle Flag").push().setValue(ChessBoardConsole.whiteRightCastleFlag)
+        database.child(matchName).child("White Left Castle Flag").push().setValue(ChessBoardConsole.whiteLeftCastleFlag)
+        database.child(matchName).child("Black Right Castle Flag").push().setValue(ChessBoardConsole.blackRightCastleFlag)
+        database.child(matchName).child("Black Left Castle Flag").push().setValue(ChessBoardConsole.blackLeftCastleFlag)
     }
 
-    fun moveonline(data : String , move : Boolean){
+    private fun updateLocal()
+    {
+        database.child(matchName).get().addOnSuccessListener {
 
-        if(move) {
-            val buttonselected: Button? = when (data.toInt()) {
-                1 -> test_btn
-                else -> {
-                    reset_btn
+            if (it.exists()){
+                try{
+                    var boardUpdateString: String = it.child("Board String").value as String
+                    ChessBoardConsole.update(boardUpdateString)
+                    ChessBoardConsole.whiteEnPassantFlag = it.child("White EnPassant Flag").value as Int
+                    ChessBoardConsole.blackEnPassantFlag = it.child("Black EnPassant Flag").value as Int
+                    ChessBoardConsole.whiteRightCastleFlag = it.child("White Right Castle Flag").value as Boolean
+                    ChessBoardConsole.whiteLeftCastleFlag = it.child("White Left Castle Flag").value as Boolean
+                    ChessBoardConsole.blackRightCastleFlag = it.child("Black Right Castle Flag").value as Boolean
+                    ChessBoardConsole.blackLeftCastleFlag = it.child("Black Left Castle Flag").value as Boolean
+                }catch (e: NullPointerException){
+                    println("-0-0-0-0-0---Null---0-0-0-0-0-")
                 }
-            }
-            if (buttonselected != null) {
-                buttonselected.text = "2"
-            }
-            textView1.text = "Turn : Player 1"
-            p2MoveCount +=1
-            if (buttonselected != null) {
-                buttonselected.setTextColor(Color.parseColor("#D22BB804"))
-            }
-            player2.add(data.toInt())
-            emptyCells.add(data.toInt())
 
-            if (buttonselected != null) {
-                buttonselected.isEnabled = true
+            }else{
+                Toast.makeText(this,"MATCH NOT FOUND ",Toast.LENGTH_SHORT).show()
             }
-            checkwinner()
+        }.addOnFailureListener{
+            Toast.makeText(this,"FAILED",Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun updateDatabase(cellId : Int)
-    {
-        FirebaseDatabase.getInstance().reference.child("data").child(matchName).push().setValue(cellId)
-    }
-
-    private fun checkwinner():Int
-    {
-        if(player1.contains(1) && p1MoveCount == 5) {
-            buttonDisable()
-            disableReset()
-
-            val build = AlertDialog.Builder(this)
-            build.setTitle("Game Over")
-            build.setMessage("Player 1 Wins!!" + "\n\n" + "Do you want to play again")
-            build.setPositiveButton("Ok") { dialog, which ->
-                reset()
-            }
-            build.setNegativeButton("Exit") { dialog, which ->
-                removeMatch()
-                exitProcess(1)
-
-            }
-            Handler().postDelayed({ build.show() }, 2000)
-            return 1
 
 
-        }
-        else if(player2.contains(1) && p2MoveCount == 5){
-            buttonDisable()
-            disableReset()
-
-            val build = AlertDialog.Builder(this)
-            build.setTitle("Game Over")
-            build.setMessage("Player 2 Wins!!" + "\n\n" + "Do you want to play again")
-            build.setPositiveButton("Ok"){dialog, which ->
-                reset()
-            }
-            build.setNegativeButton("Exit"){dialog, which ->
-                removeMatch()
-                exitProcess(1)
-            }
-            Handler().postDelayed(Runnable { build.show() } , 2000)
-            return 1
-        }
-        else if(emptyCells.contains(1) && emptyCells.contains(2) && emptyCells.contains(3) && emptyCells.contains(4) && emptyCells.contains(5) && emptyCells.contains(6) && emptyCells.contains(7) &&
-            emptyCells.contains(8) && emptyCells.contains(9) ) {
-
-            val build = AlertDialog.Builder(this)
-            build.setTitle("Game Draw")
-            build.setMessage("Nobody Wins" + "\n\n" + "Do you want to play again")
-            build.setPositiveButton("Ok"){dialog, which ->
-                reset()
-            }
-            build.setNegativeButton("Exit"){dialog, which ->
-                exitProcess(1)
-                removeMatch()
-            }
-            build.show()
-            return 1
-
-        }
-        return 0
-    }
+//    private fun checkwinner():Int
+//    {
+//        if(player1.contains(1) && p1MoveCount == 5) {
+//            buttonDisable()
+//            disableReset()
+//
+//            val build = AlertDialog.Builder(this)
+//            build.setTitle("Game Over")
+//            build.setMessage("Player 1 Wins!!" + "\n\n" + "Do you want to play again")
+//            build.setPositiveButton("Ok") { dialog, which ->
+//                reset()
+//            }
+//            build.setNegativeButton("Exit") { dialog, which ->
+//                removeMatch()
+//                exitProcess(1)
+//
+//            }
+//            Handler().postDelayed({ build.show() }, 2000)
+//            return 1
+//
+//
+//        }
+//        else if(player2.contains(1) && p2MoveCount == 5){
+//            buttonDisable()
+//            disableReset()
+//
+//            val build = AlertDialog.Builder(this)
+//            build.setTitle("Game Over")
+//            build.setMessage("Player 2 Wins!!" + "\n\n" + "Do you want to play again")
+//            build.setPositiveButton("Ok"){dialog, which ->
+//                reset()
+//            }
+//            build.setNegativeButton("Exit"){dialog, which ->
+//                removeMatch()
+//                exitProcess(1)
+//            }
+//            Handler().postDelayed(Runnable { build.show() } , 2000)
+//            return 1
+//        }
+//        else if(emptyCells.contains(1) && emptyCells.contains(2) && emptyCells.contains(3) && emptyCells.contains(4) && emptyCells.contains(5) && emptyCells.contains(6) && emptyCells.contains(7) &&
+//            emptyCells.contains(8) && emptyCells.contains(9) ) {
+//
+//            val build = AlertDialog.Builder(this)
+//            build.setTitle("Game Draw")
+//            build.setMessage("Nobody Wins" + "\n\n" + "Do you want to play again")
+//            build.setPositiveButton("Ok"){dialog, which ->
+//                reset()
+//            }
+//            build.setNegativeButton("Exit"){dialog, which ->
+//                exitProcess(1)
+//                removeMatch()
+//            }
+//            build.show()
+//            return 1
+//
+//        }
+//        return 0
+//    }
 
     fun reset()
     {
-        player1.clear()
-        player2.clear()
-        p1MoveCount = 0
-        p2MoveCount = 0
-        emptyCells.clear()
-        activeUser = 1
-
-        val buttonselected = test_btn
-        buttonselected.isEnabled = true
-        buttonselected.text = ""
-        textView2.text = "Player1 : $p1MoveCount"
-        textView2.text = "Player2 : $p2MoveCount"
-        isMyMove = isMatchMaker
+        ChessBoardConsole.reset()
+//        player1.clear()
+//        player2.clear()
+//        p1MoveCount = 0
+//        p2MoveCount = 0
+//        emptyCells.clear()
+//        activeUser = 1
+//
+//        val buttonselected = test_btn
+//        buttonselected.isEnabled = true
+//        buttonselected.text = ""
+//        textView2.text = "Player1 : $p1MoveCount"
+//        textView2.text = "Player2 : $p2MoveCount"
+//        isMyMove = isMatchMaker
         //startActivity(Intent(this,GameActivity::class.java))
         if(isMatchMaker){
             FirebaseDatabase.getInstance().reference.child("data").child(matchName).removeValue()

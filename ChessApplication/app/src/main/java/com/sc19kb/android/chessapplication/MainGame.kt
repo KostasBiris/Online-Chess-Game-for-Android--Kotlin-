@@ -16,7 +16,7 @@ class MainGame : AppCompatActivity(), ChessInterface {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main_game)
         chessBoard = findViewById<ChessBoard>(R.id.chess_board)
         chessBoard.chessInterface = this
         
