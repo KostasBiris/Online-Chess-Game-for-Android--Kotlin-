@@ -64,7 +64,9 @@ class GameActivity : AppCompatActivity(), ChessInterface {
                 println(data)
                 var boardUpdateString: String = data.toString()
                 ChessBoardConsole.update(boardUpdateString)
-                chessBoard.uiUpdate()
+
+                isMyMove = !isMyMove
+//                ChessBoardConsole.update(boardUpdateString)
 //                ChessBoardConsole.whiteEnPassantFlag = data.child("White EnPassant Flag").getValue(Int.javaClass) as Int
 //                ChessBoardConsole.blackEnPassantFlag = data.child("Black EnPassant Flag").getValue(Int.javaClass) as Int
 //                ChessBoardConsole.whiteRightCastleFlag = data.child("White Right Castle Flag").getValue(Boolean.javaClass) as Boolean
@@ -75,17 +77,11 @@ class GameActivity : AppCompatActivity(), ChessInterface {
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val data = snapshot.value
-//                if(isMyMove){
-//                    isMyMove = false
-//                   // updateDatabase()
-//                }
-//                else{
-//                    isMyMove = true
-//                    updateLocal()
-//                }
+                println(data)
+                var boardUpdateString: String = data.toString()
+                ChessBoardConsole.update(boardUpdateString)
 
-
-
+                isMyMove = !isMyMove
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
@@ -146,13 +142,13 @@ class GameActivity : AppCompatActivity(), ChessInterface {
 
     private fun updateDatabase()
     {
-        database.child(matchName).child("Board String").push().setValue(ChessBoardConsole.toString())
-        database.child(matchName).child("White EnPassant Flag").push().setValue(ChessBoardConsole.whiteEnPassantFlag)
-        database.child(matchName).child("Black EnPassant Flag").push().setValue(ChessBoardConsole.blackEnPassantFlag)
-        database.child(matchName).child("White Right Castle Flag").push().setValue(ChessBoardConsole.whiteRightCastleFlag)
-        database.child(matchName).child("White Left Castle Flag").push().setValue(ChessBoardConsole.whiteLeftCastleFlag)
-        database.child(matchName).child("Black Right Castle Flag").push().setValue(ChessBoardConsole.blackRightCastleFlag)
-        database.child(matchName).child("Black Left Castle Flag").push().setValue(ChessBoardConsole.blackLeftCastleFlag)
+        database.child(matchName).child("Board String").setValue(ChessBoardConsole.moveString)
+//        database.child(matchName).child("White EnPassant Flag").setValue(ChessBoardConsole.whiteEnPassantFlag)
+//        database.child(matchName).child("Black EnPassant Flag").setValue(ChessBoardConsole.blackEnPassantFlag)
+//        database.child(matchName).child("White Right Castle Flag").setValue(ChessBoardConsole.whiteRightCastleFlag)
+//        database.child(matchName).child("White Left Castle Flag").setValue(ChessBoardConsole.whiteLeftCastleFlag)
+//        database.child(matchName).child("Black Right Castle Flag").setValue(ChessBoardConsole.blackRightCastleFlag)
+//        database.child(matchName).child("Black Left Castle Flag").setValue(ChessBoardConsole.blackLeftCastleFlag)
     }
 
 //    private fun updateLocal()

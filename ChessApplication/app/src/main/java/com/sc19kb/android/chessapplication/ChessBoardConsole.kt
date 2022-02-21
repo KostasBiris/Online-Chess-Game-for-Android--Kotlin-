@@ -16,6 +16,8 @@ import java.lang.Math.abs
 
 object ChessBoardConsole {
 
+    var moveString: String = ""
+
     var round:ChessArmy = ChessArmy.WHITE
 
     //Special move flags
@@ -311,6 +313,8 @@ object ChessBoardConsole {
                 piecesSet.remove(it)
             }
 
+            moveString = moveToString(curColumn, curRow, destColumn, destRow)
+
             // If there is an enemy piece in that square, remove it and put
             // the selected piece in that square
             piecesSet.remove(selectedPiece)
@@ -359,119 +363,161 @@ object ChessBoardConsole {
         }
     }
 
-
     // Turns the chess board into a printable string
-    override fun toString(): String {
+    fun moveToString(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): String {
+        val curColumnString = curColumn.toString()
+        val curRowString = curRow.toString()
+        val destColumnString = destColumn.toString()
+        val destRowString = destRow.toString()
 
-        //the String that contains the chessboard
-        var boardString = "\n"
-        
-        // add every row
-        for (row in 7 downTo 0) {
-//            boardString += "$row"
-            
-            // add every column in a row
-            for (column in 0..7) {
+        val string: String = "$curColumnString,$curRowString,$destColumnString,$destRowString"
 
-                // check if there is a piece on that square
-                val piece = pieceAt(column, row)
-
-                // if there is no piece put a dot to indicate the empty square
-                if (piece == null) {
-                    boardString += "."
-
-                // if there is a piece mark it according to its rank and colour
-                // WHITES are CAPITAL case  ,  BLACKS are Lower case
-                } else {
-                    val isWhite = piece.army == ChessArmy.WHITE
-                    boardString += when (piece.rank) {
-                        ChessRank.KING -> {
-                            if (isWhite) "K" else "k"
-                        }
-                        ChessRank.QUEEN -> {
-                            if (isWhite) "Q" else "q"
-                        }
-                        ChessRank.BISHOP -> {
-                            if (isWhite) "B" else "b"
-                        }
-                        ChessRank.ROOK -> {
-                            if (isWhite) "R" else "r"
-                        }
-                        ChessRank.KNIGHT -> {
-                            if (isWhite) "H" else "h"
-                        }
-                        ChessRank.PAWN -> {
-                            if (isWhite) "P" else "p"
-                        }
-                    }
-                }
-            }
-        }
-
-        return boardString
+        return string
     }
 
 
-    fun update( boardString: String){
-
-        var index: Int = 0
-        // add every row
-        for (row in 7 downTo 0) {
-
-            // add every column in a row
-            for (column in 0..7) {
-
-                var pieceChar: Char = boardString[index]
-
-                if ( pieceChar == '.') break
-
-                var piece: ChessPiece = ChessPiece(-1,-1, ChessArmy.WHITE, ChessRank.PAWN, R.drawable.pawn_white)
-
-                var isWhite: Boolean = pieceChar.isUpperCase()
-                var army = if (isWhite) ChessArmy.WHITE else ChessArmy.BLACK
-
-                when (pieceChar) {
-                    'K', 'k' -> {
-                        piece = if (isWhite) ChessPiece(column, row, army, ChessRank.KING, R.drawable.king_white)
-                        else ChessPiece(column, row, army, ChessRank.KING, R.drawable.king_black)
-
-                    }
-                    'Q', 'q' -> {
-                        piece = if (isWhite) ChessPiece(column, row, army, ChessRank.QUEEN, R.drawable.queen_white)
-                        else ChessPiece(column, row, army, ChessRank.QUEEN, R.drawable.queen_black)
-
-                    }
-                    'B', 'b' -> {
-                        piece = if (isWhite) ChessPiece(column, row, army, ChessRank.BISHOP, R.drawable.bishop_white)
-                        else ChessPiece(column, row, army, ChessRank.BISHOP, R.drawable.bishop_black)
-
-                    }
-                    'H', 'h' -> {
-                        piece = if (isWhite) ChessPiece(column, row, army, ChessRank.KNIGHT, R.drawable.knight_white)
-                        else ChessPiece(column, row, army, ChessRank.KNIGHT, R.drawable.knight_black)
-
-                    }
-                    'R', 'r' -> {
-                        piece = if (isWhite) ChessPiece(column, row, army, ChessRank.ROOK, R.drawable.rook_white)
-                        else ChessPiece(column, row, army, ChessRank.ROOK, R.drawable.rook_black)
-
-                    }
-                    'P', 'p' -> {
-                        piece = if (isWhite) ChessPiece(column, row, army, ChessRank.PAWN, R.drawable.pawn_white)
-                        else ChessPiece(column, row, army, ChessRank.PAWN, R.drawable.pawn_black)
-
-                    }
-                }
-
-                if (pieceAt(column,row) != null){
-                    if (pieceAt(column,row) == piece) break
-                    piecesSet.remove(pieceAt(column, row))
-                    piecesSet.add(piece)
-
-                }else piecesSet.add(piece)
-
-            }
-        }
+    fun update( moveString: String){
+       // moveString.removeRange(0,21)
+        val data = moveString.split(",").map { it.toInt() }
+        println("=0=0=0=00=0=0==0=0=0=0=0=0=0=0=0==0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=")
+        println("=0=0=0=00=0=0==0=0=0=0=0=0=0=0=0==0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=")
+        println("=0=0=0=00=0=0==0=0=0=0=0=0=0=0=0==0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=")
+        println("=0=0=0=00=0=0==0=0=0=0=0=0=0=0=0==0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=")
+        println("=0=0=0=00=0=0==0=0=0=0=0=0=0=0=0==0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=")
+        println("=0=0=0=00=0=0==0=0=0=0=0=0=0=0=0==0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=")
+        println("")
+        println("")
+        println("")
+        println(data)
+        println(data[0])
+        println(data[1])
+        println(data[2])
+        println(data[3])
+        println("")
+        println("")
+        println("")
+        println("=0=0=0=00=0=0==0=0=0=0=0=0=0=0=0==0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=")
+        println("=0=0=0=00=0=0==0=0=0=0=0=0=0=0=0==0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=")
+        println("=0=0=0=00=0=0==0=0=0=0=0=0=0=0=0==0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=")
+        println("=0=0=0=00=0=0==0=0=0=0=0=0=0=0=0==0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=")
+        println("=0=0=0=00=0=0==0=0=0=0=0=0=0=0=0==0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=")
+        println("=0=0=0=00=0=0==0=0=0=0=0=0=0=0=0==0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=")
+        movePiece(data[0],data[1],data[2],data[3])
     }
+
+
+//    // Turns the chess board into a printable string
+//    override fun toString(): String {
+//
+//        //the String that contains the chessboard
+//        var boardString = "\n"
+//
+//        // add every rows
+//        for (row in 7 downTo 0) {
+////            boardString += "$row"
+//
+//            // add every column in a row
+//            for (column in 0..7) {
+//
+//                // check if there is a piece on that square
+//                val piece = pieceAt(column, row)
+//
+//                // if there is no piece put a dot to indicate the empty square
+//                if (piece == null) {
+//                    boardString += "."
+//
+//                // if there is a piece mark it according to its rank and colour
+//                // WHITES are CAPITAL case  ,  BLACKS are Lower case
+//                } else {
+//                    val isWhite = piece.army == ChessArmy.WHITE
+//                    boardString += when (piece.rank) {
+//                        ChessRank.KING -> {
+//                            if (isWhite) "K" else "k"
+//                        }
+//                        ChessRank.QUEEN -> {
+//                            if (isWhite) "Q" else "q"
+//                        }
+//                        ChessRank.BISHOP -> {
+//                            if (isWhite) "B" else "b"
+//                        }
+//                        ChessRank.ROOK -> {
+//                            if (isWhite) "R" else "r"
+//                        }
+//                        ChessRank.KNIGHT -> {
+//                            if (isWhite) "H" else "h"
+//                        }
+//                        ChessRank.PAWN -> {
+//                            if (isWhite) "P" else "p"
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        return boardString
+//    }
+//
+//
+//    fun update( boardString: String){
+//
+//        var index: Int = 0
+//        // add every row
+//        for (row in 7 downTo 0) {
+//
+//            // add every column in a row
+//            for (column in 0..7) {
+//
+//                var pieceChar: Char = boardString[index]
+//
+//                if ( pieceChar == '.') break
+//
+//                var piece: ChessPiece = ChessPiece(-1,-1, ChessArmy.WHITE, ChessRank.PAWN, R.drawable.pawn_white)
+//
+//                var isWhite: Boolean = pieceChar.isUpperCase()
+//                var army = if (isWhite) ChessArmy.WHITE else ChessArmy.BLACK
+//
+//                when (pieceChar) {
+//                    'K', 'k' -> {
+//                        piece = if (isWhite) ChessPiece(column, row, army, ChessRank.KING, R.drawable.king_white)
+//                        else ChessPiece(column, row, army, ChessRank.KING, R.drawable.king_black)
+//
+//                    }
+//                    'Q', 'q' -> {
+//                        piece = if (isWhite) ChessPiece(column, row, army, ChessRank.QUEEN, R.drawable.queen_white)
+//                        else ChessPiece(column, row, army, ChessRank.QUEEN, R.drawable.queen_black)
+//
+//                    }
+//                    'B', 'b' -> {
+//                        piece = if (isWhite) ChessPiece(column, row, army, ChessRank.BISHOP, R.drawable.bishop_white)
+//                        else ChessPiece(column, row, army, ChessRank.BISHOP, R.drawable.bishop_black)
+//
+//                    }
+//                    'H', 'h' -> {
+//                        piece = if (isWhite) ChessPiece(column, row, army, ChessRank.KNIGHT, R.drawable.knight_white)
+//                        else ChessPiece(column, row, army, ChessRank.KNIGHT, R.drawable.knight_black)
+//
+//                    }
+//                    'R', 'r' -> {
+//                        piece = if (isWhite) ChessPiece(column, row, army, ChessRank.ROOK, R.drawable.rook_white)
+//                        else ChessPiece(column, row, army, ChessRank.ROOK, R.drawable.rook_black)
+//
+//                    }
+//                    'P', 'p' -> {
+//                        piece = if (isWhite) ChessPiece(column, row, army, ChessRank.PAWN, R.drawable.pawn_white)
+//                        else ChessPiece(column, row, army, ChessRank.PAWN, R.drawable.pawn_black)
+//
+//                    }
+//                }
+//
+//                if (pieceAt(column,row) != null){
+//                    if (pieceAt(column,row) == piece) break
+//                    piecesSet.remove(pieceAt(column, row))
+//                    piecesSet.add(piece)
+//
+//                }else piecesSet.add(piece)
+//
+//            }
+//        }
+//    }
 
 }
