@@ -56,6 +56,9 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
     private var selectedPieceX = -1f
     private var selectedPieceY = -1f
 
+    // Chess Board Canvas
+    private var boardCanvas: Canvas? = null
+
     var chessInterface: ChessInterface? = null
 
     init {
@@ -64,6 +67,7 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
 
     override fun onDraw(canvas: Canvas?) {
         canvas ?: return
+        boardCanvas = canvas
 
         val chessBoardSize = min(width, height) * scaleFactor
         cellSize = chessBoardSize / 8f
@@ -73,6 +77,11 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
         drawChessboard(canvas)
         drawPieces(canvas)
     }
+
+    fun uiUpdate(){
+        boardCanvas?.let { drawPieces(it) }
+    }
+
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event ?: return false
@@ -104,7 +113,7 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
         return true
     }
 
-    private fun drawPieces(canvas: Canvas) {
+     private fun drawPieces(canvas: Canvas) {
         // draw every piece in each row
         for (row in 0..7) {
             //draw every piece in each column in a row

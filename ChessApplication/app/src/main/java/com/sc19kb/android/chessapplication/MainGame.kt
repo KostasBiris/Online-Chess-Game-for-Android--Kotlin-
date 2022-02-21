@@ -19,7 +19,6 @@ class MainGame : AppCompatActivity(), ChessInterface {
         setContentView(R.layout.activity_main_game)
         chessBoard = findViewById<ChessBoard>(R.id.chess_board)
         chessBoard.chessInterface = this
-        
     }
 
     override fun pieceAt(col: Int, row: Int): ChessPiece? {

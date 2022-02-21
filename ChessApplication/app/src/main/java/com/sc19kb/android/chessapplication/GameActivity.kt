@@ -28,6 +28,7 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.getValue
 import kotlinx.android.synthetic.main.activity_game.*
 import java.io.PrintWriter
 import kotlin.system.exitProcess
@@ -59,7 +60,17 @@ class GameActivity : AppCompatActivity(), ChessInterface {
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                updateLocal()
+                var data = snapshot.value
+                println(data)
+                var boardUpdateString: String = data.toString()
+                ChessBoardConsole.update(boardUpdateString)
+                chessBoard.uiUpdate()
+//                ChessBoardConsole.whiteEnPassantFlag = data.child("White EnPassant Flag").getValue(Int.javaClass) as Int
+//                ChessBoardConsole.blackEnPassantFlag = data.child("Black EnPassant Flag").getValue(Int.javaClass) as Int
+//                ChessBoardConsole.whiteRightCastleFlag = data.child("White Right Castle Flag").getValue(Boolean.javaClass) as Boolean
+//                ChessBoardConsole.whiteLeftCastleFlag = data.child("White Left Castle Flag").getValue(Boolean.javaClass) as Boolean
+//                ChessBoardConsole.blackRightCastleFlag = data.child("Black Right Castle Flag").getValue(Boolean.javaClass) as Boolean
+//                ChessBoardConsole.blackLeftCastleFlag = data.child("Black Left Castle Flag").getValue(Boolean.javaClass) as Boolean
             }
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
@@ -144,31 +155,31 @@ class GameActivity : AppCompatActivity(), ChessInterface {
         database.child(matchName).child("Black Left Castle Flag").push().setValue(ChessBoardConsole.blackLeftCastleFlag)
     }
 
-    private fun updateLocal()
-    {
-        database.child(matchName).get().addOnSuccessListener {
-
-            if (it.exists()){
-                try{
-                    var boardUpdateString: String = it.child("Board String").value as String
-                    ChessBoardConsole.update(boardUpdateString)
-                    ChessBoardConsole.whiteEnPassantFlag = it.child("White EnPassant Flag").value as Int
-                    ChessBoardConsole.blackEnPassantFlag = it.child("Black EnPassant Flag").value as Int
-                    ChessBoardConsole.whiteRightCastleFlag = it.child("White Right Castle Flag").value as Boolean
-                    ChessBoardConsole.whiteLeftCastleFlag = it.child("White Left Castle Flag").value as Boolean
-                    ChessBoardConsole.blackRightCastleFlag = it.child("Black Right Castle Flag").value as Boolean
-                    ChessBoardConsole.blackLeftCastleFlag = it.child("Black Left Castle Flag").value as Boolean
-                }catch (e: NullPointerException){
-                    println("-0-0-0-0-0---Null---0-0-0-0-0-")
-                }
-
-            }else{
-                Toast.makeText(this,"MATCH NOT FOUND ",Toast.LENGTH_SHORT).show()
-            }
-        }.addOnFailureListener{
-            Toast.makeText(this,"FAILED",Toast.LENGTH_SHORT).show()
-        }
-    }
+//    private fun updateLocal()
+//    {
+//        database.child(matchName).get().addOnSuccessListener {
+//
+//            if (it.exists()){
+//                try{
+//                    var boardUpdateString: String = it.child("Board String").getValue<String>() as String
+//                    ChessBoardConsole.update(boardUpdateString)
+//                    ChessBoardConsole.whiteEnPassantFlag = it.child("White EnPassant Flag").getValue<Int>() as Int
+//                    ChessBoardConsole.blackEnPassantFlag = it.child("Black EnPassant Flag").getValue<Int>() as Int
+//                    ChessBoardConsole.whiteRightCastleFlag = it.child("White Right Castle Flag").getValue<Boolean>() as Boolean
+//                    ChessBoardConsole.whiteLeftCastleFlag = it.child("White Left Castle Flag").getValue<Boolean>() as Boolean
+//                    ChessBoardConsole.blackRightCastleFlag = it.child("Black Right Castle Flag").getValue<Boolean>() as Boolean
+//                    ChessBoardConsole.blackLeftCastleFlag = it.child("Black Left Castle Flag").getValue<Boolean>() as Boolean
+//                }catch (e: NullPointerException){
+//                    println("-0-0-0-0-0---Null---0-0-0-0-0-")
+//                }
+//
+//            }else{
+//                Toast.makeText(this,"MATCH NOT FOUND ",Toast.LENGTH_SHORT).show()
+//            }
+//        }.addOnFailureListener{
+//            Toast.makeText(this,"FAILED",Toast.LENGTH_SHORT).show()
+//        }
+//    }
 
 
 
