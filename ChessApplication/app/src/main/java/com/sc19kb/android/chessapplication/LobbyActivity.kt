@@ -1,19 +1,21 @@
 package com.sc19kb.android.chessapplication
 
+import android.content.DialogInterface
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ListView
 import android.widget.Toast
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import kotlinx.android.synthetic.main.activity_lobby.*
-import android.util.Log
+import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
-import java.io.PrintWriter
-import java.util.concurrent.Executors
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.*
+import com.google.firebase.ktx.Firebase
+import kotlinx.android.synthetic.main.activity_lobby.*
 
 var isMatchMaker = true
 var matchName = "null"
@@ -21,15 +23,27 @@ var matchNameFound = false
 var checkTemp = true
 var keyValue:String = "null"
 
+
+
 class LobbyActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lobby)
-        val database = FirebaseDatabase.getInstance().getReference("Matches")
+        val databaseMatches = FirebaseDatabase.getInstance().getReference("Matches")
+        val databaseUsers = FirebaseDatabase.getInstance().getReference("Users")
 
 //--------- Create Match : [Start] ------------------------------
         Create.setOnClickListener{
+//===================================================================================
+//            val user = Firebase.auth.currentUser
+//            user?.let {
+//                for (profile in it.providerData) {
+//                    val email = profile.email
+//                    databaseUsers.child("User Email").setValue(email)
+//                }
+//            }
+//===================================================================================
             matchName = "null"
             matchNameFound = false
             checkTemp = true
@@ -43,8 +57,8 @@ class LobbyActivity : AppCompatActivity() {
             if(matchName != "null" && matchName != "") {
 
                 isMatchMaker = true
-                //Adds the new game match on the "matches" table in the database
-                database.addValueEventListener(object  :ValueEventListener{
+                //Adds the new game match on the "Matches" list in the database
+                databaseMatches.addValueEventListener(object  :ValueEventListener{
                     override fun onCancelled(error: DatabaseError) {
                         TODO("Not yet implemented")
                     }
@@ -65,7 +79,7 @@ class LobbyActivity : AppCompatActivity() {
 
                             //Create new match and wait for the game to begin
                             else{
-                                database.push().setValue(matchName)
+                                databaseMatches.push().setValue(matchName)
                                 isValueAvailable(snapshot,matchName)
                                 checkTemp = false
                                 Handler().postDelayed({
@@ -112,10 +126,7 @@ class LobbyActivity : AppCompatActivity() {
                 textView4.visibility = View.GONE
                 progressBar.visibility = View.VISIBLE
                 isMatchMaker = false
-                database.addValueEventListener(object:ValueEventListener{
-                    override fun onCancelled(error: DatabaseError) {
-                        TODO("Not yet implemented")
-                    }
+                databaseMatches.addValueEventListener(object:ValueEventListener{
 
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val data:Boolean = isValueAvailable(snapshot , matchName)
@@ -124,11 +135,6 @@ class LobbyActivity : AppCompatActivity() {
                             if(data) {
                                 matchNameFound = true
                                 accepted()
-//                                Create.visibility = View.VISIBLE
-//                                Join.visibility = View.VISIBLE
-//                                MatchName.visibility = View.VISIBLE
-//                                textView4.visibility = View.VISIBLE
-//                                progressBar.visibility = View.GONE
                             }
                             else{
                                 Create.visibility = View.VISIBLE
@@ -141,6 +147,10 @@ class LobbyActivity : AppCompatActivity() {
                         } , 2000)
 
 
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        TODO("Not yet implemented")
                     }
 
 
@@ -158,11 +168,6 @@ class LobbyActivity : AppCompatActivity() {
 
     fun accepted() {
         startActivity(Intent(this, GameActivity::class.java))
-//        Create.visibility = View.VISIBLE
-//        Join.visibility = View.VISIBLE
-//        MatchName.visibility = View.VISIBLE
-//        textView4.visibility = View.VISIBLE
-//        progressBar.visibility = View.GONE
         finish()
     }
 
