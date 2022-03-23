@@ -15,26 +15,19 @@ package com.sc19kb.android.chessapplication
  *
  */
 
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
-import android.view.View
-import android.widget.Button
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.getValue
 import kotlinx.android.synthetic.main.activity_game.*
 import java.io.PrintWriter
-import kotlin.system.exitProcess
-import java.lang.Math.abs
 import java.util.concurrent.Executors
-
+import kotlin.system.exitProcess
 
 class GameActivity : AppCompatActivity(), ChessInterface {
     var isMyMove = isMatchMaker
@@ -66,13 +59,7 @@ class GameActivity : AppCompatActivity(), ChessInterface {
                 ChessBoardConsole.update(boardUpdateString)
 
                 isMyMove = !isMyMove
-//                ChessBoardConsole.update(boardUpdateString)
-//                ChessBoardConsole.whiteEnPassantFlag = data.child("White EnPassant Flag").getValue(Int.javaClass) as Int
-//                ChessBoardConsole.blackEnPassantFlag = data.child("Black EnPassant Flag").getValue(Int.javaClass) as Int
-//                ChessBoardConsole.whiteRightCastleFlag = data.child("White Right Castle Flag").getValue(Boolean.javaClass) as Boolean
-//                ChessBoardConsole.whiteLeftCastleFlag = data.child("White Left Castle Flag").getValue(Boolean.javaClass) as Boolean
-//                ChessBoardConsole.blackRightCastleFlag = data.child("Black Right Castle Flag").getValue(Boolean.javaClass) as Boolean
-//                ChessBoardConsole.blackLeftCastleFlag = data.child("Black Left Castle Flag").getValue(Boolean.javaClass) as Boolean
+
             }
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
@@ -241,26 +228,10 @@ class GameActivity : AppCompatActivity(), ChessInterface {
     fun reset()
     {
         ChessBoardConsole.reset()
-//        player1.clear()
-//        player2.clear()
-//        p1MoveCount = 0
-//        p2MoveCount = 0
-//        emptyCells.clear()
-//        activeUser = 1
-//
-//        val buttonselected = test_btn
-//        buttonselected.isEnabled = true
-//        buttonselected.text = ""
-//        textView2.text = "Player1 : $p1MoveCount"
-//        textView2.text = "Player2 : $p2MoveCount"
-//        isMyMove = isMatchMaker
-        //startActivity(Intent(this,GameActivity::class.java))
+
         if(isMatchMaker){
             FirebaseDatabase.getInstance().reference.child("data").child(matchName).removeValue()
         }
-
-
-
     }
 
     private fun buttonDisable()
