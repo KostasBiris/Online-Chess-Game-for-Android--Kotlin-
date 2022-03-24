@@ -14,14 +14,10 @@ import android.util.Log
 import android.widget.Toast
 import java.lang.Math.abs
 
-var round:ChessArmy = ChessArmy.WHITE
-
-
-
 
 object ChessBoardConsole {
     var moveString: String = ""
-
+    var round:ChessArmy = ChessArmy.WHITE
     //Special move flags
     var whiteEnPassantFlag: Int = -1
     var blackEnPassantFlag: Int = -1
@@ -31,6 +27,8 @@ object ChessBoardConsole {
     var blackLeftCastleFlag: Boolean = true
     var whiteChecked: Boolean = false
     var blackChecked: Boolean = false
+    var whiteCheckMated: Boolean = false
+    var blackCheckMated: Boolean = false
 
     var piecesSet = mutableSetOf<ChessPiece>()
 
@@ -309,7 +307,9 @@ object ChessBoardConsole {
         }
 
         if (canQueenMove(army, curColumn, curRow, destColumn, destRow)) {
-            var b: Boolean  = abs(curColumn - destColumn) == 1 && abs(curRow - destRow) == 1 || abs(curColumn - destColumn) + abs(curRow - destRow) == 1
+            var b: Boolean  = !isThreatened(destColumn,destRow,enemy) &&
+                    (abs(curColumn - destColumn) == 1 && abs(curRow - destRow) == 1 || abs(curColumn - destColumn) + abs(curRow - destRow) == 1)
+
             if(b && army == ChessArmy.WHITE) {
                 whiteRightCastleFlag = false
                 whiteLeftCastleFlag = false
@@ -325,14 +325,21 @@ object ChessBoardConsole {
     }
 
 
-    fun canMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int, curRound: ChessArmy = round): Boolean {
+    fun canMove(curColumn: Int, curRow: Int, destColumn: Int, destRow: Int, curRound: ChessArmy = round, doRoundCheck: Boolean = true): Boolean {
 
         if (curColumn == destColumn && curRow == destRow) {
             return false
         }
         val movingPiece = pieceAt(curColumn, curRow)
         if (movingPiece == null) return false
-        if (movingPiece.army != curRound) return false
+
+        println("DO ROUND CHECK: $doRoundCheck")
+        // doRoundCheck is false when we want to check if a piece from the enemy army can make a move
+        // (Used when trying to see if the enemy king has been checkmated)
+        if (movingPiece.army != curRound) {
+            if (doRoundCheck) return false
+            else print("LOL")
+        }
 
         return when(movingPiece.rank) {
             ChessRank.PAWN -> canPawnMove(movingPiece.army, curColumn, curRow, destColumn, destRow)
@@ -345,10 +352,10 @@ object ChessBoardConsole {
         }
     }
 
-    //checks if square is theatened by some piece of enemy army
+    //checks if square is threatened by some piece of enemy army, used by isKingChecked() and isKingCheckMated()
     fun isThreatened(column: Int, row: Int, enemy: ChessArmy): Boolean{
         for (piece in piecesSet){
-            if (piece.army == enemy) {
+            if (piece.army == enemy && piece.rank != ChessRank.KING) {
                 if (canMove(piece.column, piece.row, column, row, enemy)) return true
             }
         }
@@ -359,10 +366,7 @@ object ChessBoardConsole {
     fun isKingChecked(curRound: ChessArmy): Boolean{
         for (piece in piecesSet){
             if (piece.rank == ChessRank.KING && piece.army != curRound){
-                if (isThreatened(piece.column, piece.row, curRound)) {
-                    //if (piece.army == ChessArmy.WHITE) whiteChecked = true else blackChecked = true
-                    return true
-                }
+                if (isThreatened(piece.column, piece.row, curRound)) return true
             }
         }
         return false
@@ -370,11 +374,99 @@ object ChessBoardConsole {
 
     //checks if king is check-mated
     fun isKingCheckedMated(curRound: ChessArmy): Boolean{
+
         for (piece in piecesSet){
             if (piece.rank == ChessRank.KING && piece.army != curRound){
-                if (isThreatened(piece.column, piece.row, curRound)) {
-                    //if (piece.army == ChessArmy.WHITE) whiteChecked = true else blackChecked = true
-                    return true
+                val column = piece.column
+                val row = piece.row
+                println("KING ( $column , $row )")
+                // We pass the king piece's army to isThreatened instead of the current round, to see if the king is checkmated, without needing to wait for the next round
+                val army = piece.army
+                println(army)
+
+                val moveUp: Boolean = canMove(column, row, column, row+1, army, false)
+                val moveDown: Boolean = canMove(column, row, column, row-1, army, false)
+                val moveLeft: Boolean = canMove(column, row, column-1, row, army, false)
+                val moveRight: Boolean = canMove(column, row, column+1, row, army, false)
+
+                val moveUpLeft: Boolean = canMove(column, row, column-1, row+1, army, false)
+                val moveUpRight: Boolean = canMove(column, row, column+1, row+1, army, false)
+                val moveDownLeft: Boolean = canMove(column, row, column-1, row-1, army, false)
+                val moveDownRight: Boolean = canMove(column, row, column+1, row-1, army, false)
+
+                println(moveUp)
+                println(moveDown)
+                println(moveLeft)
+                println(moveRight)
+                println(moveUpLeft)
+                println(moveUpRight)
+                println(moveDownLeft)
+                println(moveDownRight)
+
+
+
+                // Check if the King can move if depending on his current position:
+
+                // 1. Top Left Corner
+                if (column == 0 && row == 7){
+                    println("IN OPTION 1")
+                    return ( !moveDown && !moveRight && !moveDownRight)
+                }
+
+                // 2. Top Right Corner
+                else if (column == 7 && row == 7){
+                    println("IN OPTION 2")
+                    return ( !moveDown && !moveLeft && !moveDownLeft)
+                }
+
+                // 3. Bottom Left Corner
+                else if (column == 0 && row == 0){
+                    println("IN OPTION 3")
+                    return ( !moveUp && !moveRight && !moveDownRight)
+                }
+
+                // 4. Bottom Right Corner
+                else if (column == 7 && row == 0){
+                    println("IN OPTION 4")
+                    return ( !moveDown && !moveRight && !moveDownRight)
+                }
+
+                // 5. Top Row (not corner)
+                else if (column != 0 && column != 7 && row == 7){
+                    println("IN OPTION 5")
+                    return ( !moveDown && !moveRight && !moveDownRight)
+                }
+
+                // 6. Bottom Row (not corner)
+                else if (column != 0 && column != 7 && row == 0) {
+                    println("IN OPTION 6")
+                    return ( !moveDown && !moveRight && !moveDownRight)
+                }
+
+                // 7. Leftmost Column (not corner)
+                else if (column == 0 && row != 0 && row != 7) {
+                    println("IN OPTION 7")
+                    return ( !moveDown && !moveRight && !moveDownRight)
+                }
+
+                // 8. Rightmost Column (not corner)
+                else if (column == 7 && row != 0 && row != 7) {
+                    println("IN OPTION 8")
+                    return ( !moveDown && !moveRight && !moveDownRight)
+                }
+
+                // 9. Rest of the Board
+                else if (column != 0 && row != 0 && column != 7 && row != 7) {
+                    println("IN OPTION 9")
+                    println(!moveUp && !moveDown && !moveLeft && !moveRight && !moveUpLeft && !moveUpRight && !moveDownLeft && !moveDownRight)
+                    return (!moveUp && !moveDown && !moveLeft && !moveRight && !moveUpLeft && !moveUpRight && !moveDownLeft && !moveDownRight)
+                }
+
+
+                // King is able to move (not checkmated)
+                else{
+                    println("IN OPTION 10, NO CHECKMATE")
+                    return false
                 }
             }
         }
@@ -410,7 +502,7 @@ object ChessBoardConsole {
             piecesSet.remove(selectedPiece)
             piecesSet.add(ChessPiece(destColumn, destRow, selectedPiece.army, selectedPiece.rank, selectedPiece.resID))
 
-            // If the selected piece is a Pawn and it reaches the opposite side. Upgrade it into a Queen
+            // If Pawn reaches the opposite side. Upgrade it into a Queen
             if(selectedPiece.rank == ChessRank.PAWN && ( destRow == 7 || destRow == 0)) pawnUpgrade(selectedPiece.army,destColumn,destRow)
 
             val enemy = if(round==ChessArmy.WHITE) ChessArmy.BLACK else ChessArmy.WHITE
@@ -437,18 +529,34 @@ object ChessBoardConsole {
                 ChessRank.QUEEN-> "Queen"
                 ChessRank.KING-> "King"
             }
+
             println(roundString + rankString + "from (" + curColumn + ","+ curRow +") to (" + destColumn + "," + destRow + ")")
-            if (isKingChecked(round)){//check the enemy king for check
+
+            // Check the enemy king has been checked by a piece moved in this round
+            if (isKingChecked(round)){
                 if (round == ChessArmy.WHITE) {
                     blackChecked = true
                     println("CHECK! White to Black.")
-
                 }else{
                     whiteChecked = true
                     println("CHECK! Black to White.")
                 }
-
             }
+
+            // Check if the enemy king has been checkmated before changing round
+            if (isKingCheckedMated(round)){
+                if (round == ChessArmy.WHITE) {
+                    blackCheckMated = true
+
+                    if (blackCheckMated) println("---BLACK CHECKMATED---")
+
+                }else{
+                    whiteChecked = true
+                    if (whiteCheckMated) println("---WHITE CHECKMATED---")
+                }
+            }
+
+
 
             // Change Round
             moveString = moveToString(curColumn, curRow, destColumn, destRow)
@@ -475,7 +583,13 @@ object ChessBoardConsole {
 
         //Kings and Queens are unique pieces, so we arrange them by one
         piecesSet.add(ChessPiece(3, 0, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
-        piecesSet.add(ChessPiece(3, 7, ChessArmy.BLACK, ChessRank.QUEEN, R.drawable.queen_black))
+//        piecesSet.add(ChessPiece(3, 7, ChessArmy.BLACK, ChessRank.QUEEN, R.drawable.queen_black))
+//=====================FOR CHECKMATE CHECK==============================================================
+        piecesSet.add(ChessPiece(2, 0, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+//        piecesSet.add(ChessPiece(2, 7, ChessArmy.BLACK, ChessRank.QUEEN, R.drawable.queen_black))
+        piecesSet.add(ChessPiece(1, 0, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+//        piecesSet.add(ChessPiece(1, 7, ChessArmy.BLACK, ChessRank.QUEEN, R.drawable.queen_black))
+//======================================================================================================
         piecesSet.add(ChessPiece(4, 0, ChessArmy.WHITE, ChessRank.KING, R.drawable.king_white))
         piecesSet.add(ChessPiece(4, 7, ChessArmy.BLACK, ChessRank.KING, R.drawable.king_black))
 
@@ -487,15 +601,15 @@ object ChessBoardConsole {
 //            piecesSet.add(ChessPiece(1 + i * 5, 0, ChessArmy.WHITE, ChessRank.KNIGHT, R.drawable.knight_white))
 //            piecesSet.add(ChessPiece(1 + i * 5, 7, ChessArmy.BLACK, ChessRank.KNIGHT, R.drawable.knight_black))
 
-            piecesSet.add(ChessPiece(0 + i * 7, 0, ChessArmy.WHITE, ChessRank.ROOK, R.drawable.rook_white))
-            piecesSet.add(ChessPiece(0 + i * 7, 7, ChessArmy.BLACK, ChessRank.ROOK, R.drawable.rook_black))
+//            piecesSet.add(ChessPiece(0 + i * 7, 0, ChessArmy.WHITE, ChessRank.ROOK, R.drawable.rook_white))
+//            piecesSet.add(ChessPiece(0 + i * 7, 7, ChessArmy.BLACK, ChessRank.ROOK, R.drawable.rook_black))
 
         }
 
         // Pawns come in two groups of 8
         for (i in 0..7) {
-            piecesSet.add(ChessPiece(i, 1, ChessArmy.WHITE, ChessRank.PAWN, R.drawable.pawn_white))
-            piecesSet.add(ChessPiece(i, 6, ChessArmy.BLACK, ChessRank.PAWN, R.drawable.pawn_black))
+//            piecesSet.add(ChessPiece(i, 1, ChessArmy.WHITE, ChessRank.PAWN, R.drawable.pawn_white))
+//            piecesSet.add(ChessPiece(i, 6, ChessArmy.BLACK, ChessRank.PAWN, R.drawable.pawn_black))
         }
     }
 
