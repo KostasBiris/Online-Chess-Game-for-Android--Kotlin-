@@ -10,10 +10,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.activity_lobby.*
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import java.io.PrintWriter
-import java.util.concurrent.Executors
 
 var isMatchMaker = true
 var matchName = "null"
@@ -152,7 +149,7 @@ class LobbyActivity : AppCompatActivity() {
 //--------- Join Match : [End] ------------------------------
 
     fun accepted() {
-        startActivity(Intent(this, GameActivity::class.java))
+        startActivity(Intent(this, OnlineGameActivity::class.java))
 //        Create.visibility = View.VISIBLE
 //        Join.visibility = View.VISIBLE
 //        MatchName.visibility = View.VISIBLE

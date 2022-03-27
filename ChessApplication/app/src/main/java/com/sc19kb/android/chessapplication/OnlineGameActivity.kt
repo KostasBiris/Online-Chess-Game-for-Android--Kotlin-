@@ -1,7 +1,7 @@
 package com.sc19kb.android.chessapplication
 
 /*
- * ------------------ MAIN GAME --------------------
+ * ------------------ ONLINE GAME --------------------
  *
  * This is where the two users get directed after
  * joining the game match with the same name from the Lobby
@@ -29,7 +29,7 @@ import java.io.PrintWriter
 import java.util.concurrent.Executors
 import kotlin.system.exitProcess
 
-class GameActivity : AppCompatActivity(), ChessInterface {
+class OnlineGameActivity : AppCompatActivity(), ChessInterface {
     var isMyMove = isMatchMaker
     val database = FirebaseDatabase.getInstance().getReference("Matches")
     private lateinit var chessBoard: ChessBoard

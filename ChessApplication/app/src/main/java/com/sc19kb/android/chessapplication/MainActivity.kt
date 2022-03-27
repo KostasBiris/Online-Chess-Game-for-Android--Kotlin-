@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity(){
 ////==============================================================================
 //        Log.d(TAG, "$chessModel")
 //
-//        val MainGameIntent = Intent(this, MainGame::class.java)
+//        val MainGameIntent = Intent(this, LocalGameActivity::class.java)
 //        startActivity(MainGameIntent)
 //        finish()
 ////============================================================================

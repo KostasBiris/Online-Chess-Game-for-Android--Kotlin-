@@ -56,7 +56,7 @@ class PawnTest {
         assertTrue(ChessBoardConsole.canPawnMove(ChessArmy.BLACK,5, 6, 5, 4))
 
         ChessBoardConsole.movePiece(5,6,5,4)
-        whiteEnPassantFlag = 5
+        ChessBoardConsole.whiteEnPassantFlag = 5
         assertNotNull(ChessBoardConsole.pieceAt(5, 4))
         assertEquals(ChessArmy.BLACK, ChessBoardConsole.pieceAt(5, 4)?.army)
         assertEquals(ChessRank.PAWN, ChessBoardConsole.pieceAt(5, 4)?.rank)

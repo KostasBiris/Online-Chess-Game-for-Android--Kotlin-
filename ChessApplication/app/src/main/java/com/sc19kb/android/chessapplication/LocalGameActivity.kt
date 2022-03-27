@@ -3,9 +3,7 @@ package com.sc19kb.android.chessapplication
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 
-//const val TAG = "MainGame"
-
-class MainGame : AppCompatActivity(),
+class LocalGameActivity : AppCompatActivity(),
     ChessInterface {
 
     var chessModel = ChessBoardConsole

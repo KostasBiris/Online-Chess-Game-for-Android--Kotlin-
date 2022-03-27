@@ -128,7 +128,7 @@ object ChessBoardConsole {
 
 
     // En-passant is a move executed by pawns, where they capture the enemy pawn by going behind it.
-    private fun enPassant(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean{
+    fun enPassant(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean{
         if (army==ChessArmy.WHITE && blackEnPassantFlag!=destColumn || army==ChessArmy.BLACK && whiteEnPassantFlag!=destColumn) return false
         if ((curRow != 4 && army == ChessArmy.WHITE) || (curRow != 3 && army == ChessArmy.BLACK)) return false
         if (pieceAt(destColumn, destRow) == null) {
@@ -147,7 +147,7 @@ object ChessBoardConsole {
         return false
     }
 
-    private fun Castle(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int, leftCastle: Boolean): Boolean{
+    fun Castle(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int, leftCastle: Boolean): Boolean{
         piecesSet.remove(pieceAt(curColumn, curRow))
         piecesSet.remove(pieceAt(destColumn, destRow))
         var newKingCol = 0
@@ -199,7 +199,7 @@ object ChessBoardConsole {
 
 
     // Pawns can only move one Square forward but are able to move two Squares on their first move.
-    private fun canPawnMove(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
+    fun canPawnMove(army: ChessArmy, curColumn: Int, curRow: Int, destColumn: Int, destRow: Int): Boolean {
         if (curColumn == destColumn) {
             // val p = pieceAt(curColumn, curRow)
             if (curRow == 1 && army == ChessArmy.WHITE && pieceAt(curColumn, destRow) == null) { // First move of a White pawn.
@@ -422,37 +422,37 @@ object ChessBoardConsole {
                 // 3. Bottom Left Corner
                 else if (column == 0 && row == 0){
                     println("IN OPTION 3")
-                    return ( !moveUp && !moveRight && !moveDownRight)
+                    return ( !moveUp && !moveRight && !moveUpRight)
                 }
 
                 // 4. Bottom Right Corner
                 else if (column == 7 && row == 0){
                     println("IN OPTION 4")
-                    return ( !moveDown && !moveRight && !moveDownRight)
+                    return ( !moveUp && !moveLeft && !moveUpLeft)
                 }
 
                 // 5. Top Row (not corner)
                 else if (column != 0 && column != 7 && row == 7){
                     println("IN OPTION 5")
-                    return ( !moveDown && !moveRight && !moveDownRight)
+                    return ( !moveDown && !moveRight && !moveLeft && !moveDownRight && !moveDownLeft)
                 }
 
                 // 6. Bottom Row (not corner)
                 else if (column != 0 && column != 7 && row == 0) {
                     println("IN OPTION 6")
-                    return ( !moveDown && !moveRight && !moveDownRight)
+                    return ( !moveUp && !moveRight && !moveLeft && !moveUpLeft && !moveUpRight)
                 }
 
                 // 7. Leftmost Column (not corner)
                 else if (column == 0 && row != 0 && row != 7) {
                     println("IN OPTION 7")
-                    return ( !moveDown && !moveRight && !moveDownRight)
+                    return ( !moveUp && !moveDown && !moveRight && !moveUpRight && !moveDownRight)
                 }
 
                 // 8. Rightmost Column (not corner)
                 else if (column == 7 && row != 0 && row != 7) {
                     println("IN OPTION 8")
-                    return ( !moveDown && !moveRight && !moveDownRight)
+                    return ( !moveUp && !moveDown && !moveLeft && !moveUpLeft && !moveDownLeft)
                 }
 
                 // 9. Rest of the Board

@@ -1,8 +1,10 @@
 package com.sc19kb.android.chessapplication
 
+import com.sc19kb.android.chessapplication.ChessBoardConsole
 import org.junit.Assert.*
 import org.junit.Test
 import kotlin.math.exp
+import kotlin.math.round
 
 class ChessBoardConsoleTest {
 
@@ -87,5 +89,101 @@ class ChessBoardConsoleTest {
 
         println("PASS")
     }
+
+
+    @Test
+    fun isKingCheckedMated_isCorrect() {
+        print("TESTING: isKingCheckedMated_isCorrect() : ")
+
+        // 1. If King is in the Top Left Corner
+        ChessBoardConsole.piecesSet.removeAll(ChessBoardConsole.piecesSet)
+        ChessBoardConsole.piecesSet.add(ChessPiece(0, 7, ChessArmy.BLACK, ChessRank.KING, R.drawable.king_black))
+        ChessBoardConsole.piecesSet.add(ChessPiece(1, 0, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(7, 6, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+
+        assertTrue(ChessBoardConsole.isKingCheckedMated(ChessArmy.WHITE))
+        println("PASS: 1. Top Left Corner")
+
+        // 2. If King is in the Top Right Corner
+        ChessBoardConsole.piecesSet.removeAll(ChessBoardConsole.piecesSet)
+        ChessBoardConsole.piecesSet.add(ChessPiece(7, 7, ChessArmy.BLACK, ChessRank.KING, R.drawable.king_black))
+        ChessBoardConsole.piecesSet.add(ChessPiece(6, 0, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(1, 6, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+
+        assertTrue(ChessBoardConsole.isKingCheckedMated(ChessArmy.WHITE))
+        println("PASS: 2. Top Right Corner")
+
+        // 3. If King is in the Bottom Left Corner
+        ChessBoardConsole.piecesSet.removeAll(ChessBoardConsole.piecesSet)
+        ChessBoardConsole.piecesSet.add(ChessPiece(0, 0, ChessArmy.BLACK, ChessRank.KING, R.drawable.king_black))
+        ChessBoardConsole.piecesSet.add(ChessPiece(3, 1, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(1, 2, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+
+        assertTrue(ChessBoardConsole.isKingCheckedMated(ChessArmy.WHITE))
+        println("PASS: 3. Bottom Left Corner")
+
+        // 4. If King is in the Bottom Right Corner
+        ChessBoardConsole.piecesSet.removeAll(ChessBoardConsole.piecesSet)
+        ChessBoardConsole.piecesSet.add(ChessPiece(7, 0, ChessArmy.BLACK, ChessRank.KING, R.drawable.king_black))
+        ChessBoardConsole.piecesSet.add(ChessPiece(0, 1, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(6, 7, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+
+        assertTrue(ChessBoardConsole.isKingCheckedMated(ChessArmy.WHITE))
+        println("PASS: 4. Bottom Right Corner")
+
+        // 5. If King is in the Top Row (not corner)
+        ChessBoardConsole.piecesSet.removeAll(ChessBoardConsole.piecesSet)
+        ChessBoardConsole.piecesSet.add(ChessPiece(3, 7, ChessArmy.BLACK, ChessRank.KING, R.drawable.king_black))
+        ChessBoardConsole.piecesSet.add(ChessPiece(2, 0, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(3, 0, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(4, 0, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+
+        assertTrue(ChessBoardConsole.isKingCheckedMated(ChessArmy.WHITE))
+        println("PASS: 5. Top Row (not corner)")
+
+        // 6. If King is in the Bottom Row (not corner)
+        ChessBoardConsole.piecesSet.removeAll(ChessBoardConsole.piecesSet)
+        ChessBoardConsole.piecesSet.add(ChessPiece(3, 0, ChessArmy.BLACK, ChessRank.KING, R.drawable.king_black))
+        ChessBoardConsole.piecesSet.add(ChessPiece(2, 7, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(3, 7, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(4, 7, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+
+        assertTrue(ChessBoardConsole.isKingCheckedMated(ChessArmy.WHITE))
+        println("PASS: 6. Bottom Row (not corner)")
+
+        // 7. If King is in the Lefmost Column (not corner)
+        ChessBoardConsole.piecesSet.removeAll(ChessBoardConsole.piecesSet)
+        ChessBoardConsole.piecesSet.add(ChessPiece(0, 3, ChessArmy.BLACK, ChessRank.KING, R.drawable.king_black))
+        ChessBoardConsole.piecesSet.add(ChessPiece(7, 2, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(7, 3, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(7, 4, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+
+        ChessBoardConsole.movePiece(2,0,1,0)
+        assertTrue(ChessBoardConsole.isKingCheckedMated(ChessArmy.WHITE))
+        println("PASS: 7. Leftmost Column (not corner)")
+
+        // 8. If King is in the Rightmost Column (not corner)
+        ChessBoardConsole.piecesSet.removeAll(ChessBoardConsole.piecesSet)
+        ChessBoardConsole.piecesSet.add(ChessPiece(7, 3, ChessArmy.BLACK, ChessRank.KING, R.drawable.king_black))
+        ChessBoardConsole.piecesSet.add(ChessPiece(0, 2, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(0, 3, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(0, 4, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+
+        assertTrue(ChessBoardConsole.isKingCheckedMated(ChessArmy.WHITE))
+        println("PASS: 8. Rightmost Column (not corner)")
+
+        // 9. If King is in the Rest of the Board
+        ChessBoardConsole.piecesSet.removeAll(ChessBoardConsole.piecesSet)
+        ChessBoardConsole.piecesSet.add(ChessPiece(3, 5, ChessArmy.BLACK, ChessRank.KING, R.drawable.king_black))
+        ChessBoardConsole.piecesSet.add(ChessPiece(1, 6, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(7, 5, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+        ChessBoardConsole.piecesSet.add(ChessPiece(7, 4, ChessArmy.WHITE, ChessRank.QUEEN, R.drawable.queen_white))
+
+        assertTrue(ChessBoardConsole.isKingCheckedMated(ChessArmy.WHITE))
+        println("PASS: 9. Rest of the Board")
+
+        println("PASS")
+    }
+
 
 }

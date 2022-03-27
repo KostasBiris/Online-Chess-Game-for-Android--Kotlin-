@@ -28,13 +28,26 @@ class DashboardActivity : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
         val currentUser = mAuth.currentUser
 
-        // User Details
+        // User Details:
         // Id
         id_txt.text = currentUser?.uid
         // Name
         name_txt.text = currentUser?.displayName
         // Email
         email_txt.text = currentUser?.email
+
+
+        // Play Chess Online
+        play_online_btn.setOnClickListener {
+            startActivity(Intent(this , LobbyActivity::class.java))
+            finish()
+        }
+
+        // Play Chess Locally
+        play_local_btn.setOnClickListener {
+            startActivity(Intent(this , LocalGameActivity::class.java))
+            finish()
+        }
 
         // Sign-Out
         sign_out_btn.setOnClickListener {
@@ -43,17 +56,5 @@ class DashboardActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-
-        // Play Chess
-        play_btn.setOnClickListener {
-            startActivity(Intent(this , LobbyActivity::class.java))
-
-            //val MainGameIntent = Intent(this, MainGame::class.java)
-            //startActivity(Intent(this , MainGame::class.java))
-            finish()
-        }
-
-
-
     }
 }

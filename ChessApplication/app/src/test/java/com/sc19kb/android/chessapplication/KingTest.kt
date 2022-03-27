@@ -1,5 +1,9 @@
 package com.sc19kb.android.chessapplication
 
+import com.sc19kb.android.chessapplication.ChessBoardConsole.blackLeftCastleFlag
+import com.sc19kb.android.chessapplication.ChessBoardConsole.blackRightCastleFlag
+import com.sc19kb.android.chessapplication.ChessBoardConsole.whiteLeftCastleFlag
+import com.sc19kb.android.chessapplication.ChessBoardConsole.whiteRightCastleFlag
 import org.junit.Assert.*
 import org.junit.Test
 import kotlin.math.exp
