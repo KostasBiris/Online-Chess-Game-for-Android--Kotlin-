@@ -1,5 +1,17 @@
 package com.sc19kb.android.chessapplication
 
+/*
+ * ------------------ LOCAL GAME --------------------
+ *
+ * The user gets directed here after pressing "Play Local"
+ * on the Dashboard.
+ *
+ * It makes use of the Chess Interface in order to utilise
+ * Chess Core and Chess Board and use them at once to realise
+ * the Local Chess Game.
+ *
+ */
+
 import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -9,7 +21,7 @@ import androidx.appcompat.app.AlertDialog
 class LocalGameActivity : AppCompatActivity(),
     ChessInterface {
 
-    var chessModel = ChessBoardConsole
+    var chessModel = ChessCore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +78,7 @@ class LocalGameActivity : AppCompatActivity(),
     fun forfeitMatch() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Forfeited")
-        if(ChessBoardConsole.round == ChessArmy.WHITE) builder.setMessage("Black wins!")
+        if(ChessCore.round == ChessArmy.WHITE) builder.setMessage("Black wins!")
         else builder.setMessage("White wins!")
         builder.setPositiveButton("Rematch") {dialogInterface: DialogInterface, i: Int ->
             chessModel.reset()

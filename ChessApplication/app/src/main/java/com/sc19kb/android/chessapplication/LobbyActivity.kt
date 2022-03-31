@@ -1,18 +1,31 @@
 package com.sc19kb.android.chessapplication
 
-import android.content.DialogInterface
+/*
+ * ------------------ MATCH LOBBY --------------------
+ *
+ * The user gets directed here after pressing "Play Online"
+ * on the Dashboard.
+ *
+ * To Create a new chess match, they type in the name they want
+ * to give to the match and press on "Create".
+ *
+ * To Join an existing match, they type in the name of the match
+ * and then press on "Join" to join a match created by someone else.
+ *
+ */
+
+
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.activity_lobby.*
-import androidx.appcompat.app.AppCompatActivity
 
 var isMatchMaker = true
 var matchName = "null"
@@ -27,7 +40,8 @@ class LobbyActivity : AppCompatActivity() {
         setContentView(R.layout.activity_lobby)
         val database = FirebaseDatabase.getInstance().getReference("Matches")
 
-//--------- Create Match : [Start] ------------------------------
+        //======================== CREATE MATCH : [Start] =============================
+
         Create.setOnClickListener{
             matchName = "null"
             matchNameFound = false
@@ -39,8 +53,8 @@ class LobbyActivity : AppCompatActivity() {
             MatchName.visibility = View.GONE
             textView4.visibility = View.GONE
             progressBar.visibility = View.VISIBLE
-            if(matchName != "null" && matchName != "") {
 
+            if(matchName != "null" && matchName != "") {
                 isMatchMaker = true
                 //Adds the new game match on the "matches" table in the database
                 database.addValueEventListener(object  :ValueEventListener{
@@ -71,20 +85,12 @@ class LobbyActivity : AppCompatActivity() {
                                     accepted()
                                     errorMsg("Please don't go back")
                                 } , 300)
-
                             }
                         }, 2000)
-
-
-
                     }
-
                 })
-            }
-
             // Executes if a wrong match name is entered
-            else
-            {
+            } else {
                 Create.visibility = View.VISIBLE
                 Join.visibility = View.VISIBLE
                 MatchName.visibility = View.VISIBLE
@@ -93,9 +99,11 @@ class LobbyActivity : AppCompatActivity() {
                 errorMsg("Enter Match Name Properly")
             }
         }
-//--------- Create Match : [End] ------------------------------
+        //=========================== CREATE MATCH : [End] ================================
 
-//--------- Join Match : [Start] ------------------------------
+
+        //=========================== JOIN MATCH : [Start] =============================
+
         Join.setOnClickListener{
             matchName = "null"
             matchNameFound = false
@@ -123,8 +131,7 @@ class LobbyActivity : AppCompatActivity() {
                             if(data) {
                                 matchNameFound = true
                                 accepted()
-                            }
-                            else{
+                            } else{
                                 Create.visibility = View.VISIBLE
                                 Join.visibility = View.VISIBLE
                                 MatchName.visibility = View.VISIBLE
@@ -133,43 +140,25 @@ class LobbyActivity : AppCompatActivity() {
                                 errorMsg("Invalid Match Name")
                             }
                         } , 2000)
-
-
                     }
-
-
                 })
-
-            }
-            else
-            {
-                errorMsg("Enter Match Name Properly")
-            }
+            } else errorMsg("Enter Match Name Properly")
         }
-
+        //=========================== JOIN MATCH : [End] =============================
     }
-//--------- Join Match : [End] ------------------------------
 
     fun accepted() {
         startActivity(Intent(this, OnlineGameActivity::class.java))
-//        Create.visibility = View.VISIBLE
-//        Join.visibility = View.VISIBLE
-//        MatchName.visibility = View.VISIBLE
-//        textView4.visibility = View.VISIBLE
-//        progressBar.visibility = View.GONE
         finish()
     }
 
-    fun errorMsg(value : String){
-        Toast.makeText(this , value  , Toast.LENGTH_SHORT).show()
-    }
+    fun errorMsg(value : String){ Toast.makeText(this , value  , Toast.LENGTH_SHORT).show() }
 
     fun isValueAvailable(snapshot: DataSnapshot , matchName : String): Boolean {
         val data = snapshot.children
         data.forEach{
             val value = it.value.toString()
-            if(value == matchName)
-            {
+            if(value == matchName) {
                 keyValue = it.key.toString()
                 return true
             }
@@ -177,12 +166,8 @@ class LobbyActivity : AppCompatActivity() {
         return false
     }
 
-
-
     override fun onBackPressed() {
         startActivity(Intent(this, DashboardActivity::class.java))
         finish()
     }
-
-
 }

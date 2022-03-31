@@ -1,13 +1,14 @@
 package com.sc19kb.android.chessapplication
 
 /*
-* ------ CHESSBOARD VIEW ACTIVITY -------
+* ------ CHESSBOARD -------
 *
 * Creates the Chessboard User Interface on
 * which the two players will be able to play
 * a game of chess.
 */
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
@@ -47,8 +48,6 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
 
     private val bitmaps = mutableMapOf<Int, Bitmap>()
     private val paint = Paint()
-    private var selectedPieceBitmap: Bitmap? = null
-    private var selectedPiece: ChessPiece? = null
     private var curColumn: Int = -1
     private var curRow: Int = -1
 
@@ -61,9 +60,8 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
 
     var chessInterface: ChessInterface? = null
 
-    init {
-        loadBitmaps()
-    }
+    // Initialise the UI
+    init { loadBitmaps() }
 
     override fun onDraw(canvas: Canvas?) {
         canvas ?: return
@@ -78,11 +76,7 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
         drawPieces(canvas)
     }
 
-    fun uiUpdate(){
-        boardCanvas?.let { drawPieces(it) }
-    }
-
-
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event ?: return false
 
@@ -118,12 +112,9 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
         for (row in 0..7) {
             //draw every piece in each column in a row
             for (column in 0..7) {
-                if (row != curRow || column != curColumn){
-                    chessInterface?.pieceAt(column, row)?.let { drawPieceAt(canvas,column, row, it.resID) }
-                }
+                if (row != curRow || column != curColumn) chessInterface?.pieceAt(column, row)?.let { drawPieceAt(canvas,column, row, it.resID) }
             }
         }
-
         chessInterface?.pieceAt(curColumn, curRow)?.let {
             val bitmap = bitmaps[it.resID]!!
             canvas.drawBitmap(bitmap, null, RectF(selectedPieceX - cellSize/2, selectedPieceY - cellSize/2, selectedPieceX + cellSize/2,selectedPieceY + cellSize/2), paint)
@@ -131,7 +122,7 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
         
     }
 
-    // Draws a given piece inside a specified cell's borders
+    // Draw a given piece inside a specified cell's borders
     private fun drawPieceAt(canvas: Canvas, column: Int, row: Int, resID: Int) {
         val bitmap = bitmaps[resID]!!
         canvas.drawBitmap(bitmap, null, RectF(startingX + column * cellSize,startingY + (7 - row) * cellSize,startingX + (column + 1) * cellSize,startingY + ((7 - row) + 1) * cellSize), paint)
@@ -143,13 +134,13 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
         }
     }
 
-    // Draws a given piece inside a specified cell's borders
+    // Draw a given piece inside a specified cell's borders
     private fun drawSquareAt(canvas: Canvas, column: Int, row: Int, isBlack: Boolean) {
         paint.color = if (isBlack) paintBlack else paintWhite
         canvas.drawRect(startingX + column * cellSize, startingY + row * cellSize, startingX + (column + 1)* cellSize, startingY + (row + 1) * cellSize, paint)
     }
 
-    // Draws the Chessboard background white and black squares
+    // Draw the Chessboard background white and black squares
     private fun drawChessboard(canvas: Canvas) {
         // draw every square in each row
         for (row in 0..7) {
@@ -162,7 +153,7 @@ class ChessBoard(context: Context?, attrs: AttributeSet?) : View(context, attrs)
 }
 
 /*
-*                               White = 0 , Black = *
+*                        White Square = 0 , Black Square = *
 * =====================================================================================
 *        CHESSBOARD OFFICIAL OUTLINE      ||           CHESSBOARD CONSOLE OUTLINE
 * ________________________________________||________________________________________

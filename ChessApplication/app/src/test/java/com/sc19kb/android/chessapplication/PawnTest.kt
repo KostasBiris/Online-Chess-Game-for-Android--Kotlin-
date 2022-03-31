@@ -2,68 +2,67 @@ package com.sc19kb.android.chessapplication
 
 import org.junit.Assert.*
 import org.junit.Test
-import kotlin.math.exp
 
 class PawnTest {
 
     @Test
     fun firstMovePawn_isCorrect() {
-        println(ChessBoardConsole)
+        println(ChessCore)
         // WHITE
         // one step
-        assertTrue(ChessBoardConsole.canPawnMove(ChessArmy.WHITE, 0, 1, 0, 2))
+        assertTrue(ChessCore.canPawnMove(ChessArmy.WHITE, 0, 1, 0, 2))
         println("PASS 1")
         // two steps
-        assertTrue(ChessBoardConsole.canPawnMove(ChessArmy.WHITE, 0, 1, 0, 3))
+        assertTrue(ChessCore.canPawnMove(ChessArmy.WHITE, 0, 1, 0, 3))
         println("PASS 2")
         // three steps
-        assertFalse(ChessBoardConsole.canPawnMove(ChessArmy.WHITE, 0, 1, 0, 4))
+        assertFalse(ChessCore.canPawnMove(ChessArmy.WHITE, 0, 1, 0, 4))
         println("PASS 3")
 
         // BLACK
         // one step
-        assertTrue(ChessBoardConsole.canPawnMove(ChessArmy.BLACK, 0, 6, 0, 5))
+        assertTrue(ChessCore.canPawnMove(ChessArmy.BLACK, 0, 6, 0, 5))
         println("PASS 4")
         // two steps
-        assertTrue(ChessBoardConsole.canPawnMove(ChessArmy.BLACK, 0, 6, 0, 4))
+        assertTrue(ChessCore.canPawnMove(ChessArmy.BLACK, 0, 6, 0, 4))
         println("PASS 5")
         // three steps
-        assertFalse(ChessBoardConsole.canPawnMove(ChessArmy.BLACK, 0, 6, 0, 3))
+        assertFalse(ChessCore.canPawnMove(ChessArmy.BLACK, 0, 6, 0, 3))
         println("PASS 6")
     }
 
     @Test
     fun pawnCapture_isCorrect() {
-        println(ChessBoardConsole)
+        println(ChessCore)
         // capture with white pawn
-        ChessBoardConsole.piecesSet.add(ChessPiece(0, 5, ChessArmy.WHITE, ChessRank.PAWN, R.drawable.pawn_white))
-        assertTrue(ChessBoardConsole.canPawnMove(ChessArmy.WHITE, 0, 5, 1, 6))
-        ChessBoardConsole.movePiece(0, 5, 1, 6)
-        println(ChessBoardConsole)
+        ChessCore.piecesSet.add(ChessPiece(0, 5, ChessArmy.WHITE, ChessRank.PAWN, R.drawable.pawn_white))
+        assertTrue(ChessCore.canPawnMove(ChessArmy.WHITE, 0, 5, 1, 6))
+        ChessCore.movePiece(0, 5, 1, 6)
+        println(ChessCore)
 
         // capture with black pawn
-        ChessBoardConsole.piecesSet.add(ChessPiece(5, 2, ChessArmy.BLACK, ChessRank.PAWN, R.drawable.pawn_black))
-        assertTrue(ChessBoardConsole.canPawnMove(ChessArmy.BLACK, 5, 2, 4, 1))
-        ChessBoardConsole.movePiece(5, 2, 4, 1)
-        println(ChessBoardConsole)
+        ChessCore.piecesSet.add(ChessPiece(5, 2, ChessArmy.BLACK, ChessRank.PAWN, R.drawable.pawn_black))
+        assertTrue(ChessCore.canPawnMove(ChessArmy.BLACK, 5, 2, 4, 1))
+        ChessCore.movePiece(5, 2, 4, 1)
+        println(ChessCore)
     }
 
     @Test
     fun pawnEnPassant_isCorrect() {
-        ChessBoardConsole.piecesSet.add(ChessPiece(4, 3, ChessArmy.WHITE, ChessRank.PAWN, R.drawable.pawn_white))
-        ChessBoardConsole.movePiece(4,3,4,4)
+        ChessCore.piecesSet.add(ChessPiece(4, 3, ChessArmy.WHITE, ChessRank.PAWN, R.drawable.pawn_white))
+        ChessCore.movePiece(4,3,4,4)
 
-        assertTrue(ChessBoardConsole.canPawnMove(ChessArmy.BLACK,5, 6, 5, 4))
+        assertTrue(ChessCore.canPawnMove(ChessArmy.BLACK,5, 6, 5, 4))
 
-        ChessBoardConsole.movePiece(5,6,5,4)
-        ChessBoardConsole.whiteEnPassantFlag = 5
-        assertNotNull(ChessBoardConsole.pieceAt(5, 4))
-        assertEquals(ChessArmy.BLACK, ChessBoardConsole.pieceAt(5, 4)?.army)
-        assertEquals(ChessRank.PAWN, ChessBoardConsole.pieceAt(5, 4)?.rank)
+        ChessCore.movePiece(5,6,5,4)
+        ChessCore.whiteEnPassantFlag = 5
+        assertNotNull(ChessCore.pieceAt(5, 4))
+        assertEquals(ChessArmy.BLACK, ChessCore.pieceAt(5, 4)?.army)
+        assertEquals(ChessRank.PAWN, ChessCore.pieceAt(5, 4)?.rank)
 
-        assertTrue(ChessBoardConsole.canPawnMove(ChessArmy.WHITE,4, 4, 5, 5))
-        ChessBoardConsole.enPassant(ChessArmy.WHITE,4,4,5,5)
-        assertNull(ChessBoardConsole.pieceAt(5, 4))
+        assertTrue(ChessCore.canPawnMove(ChessArmy.WHITE,4, 4, 5, 5))
+        ChessCore.enPassant(ChessArmy.WHITE,4,4,5,5)
+        assertNull(ChessCore.pieceAt(5, 4))
 
     }
 }

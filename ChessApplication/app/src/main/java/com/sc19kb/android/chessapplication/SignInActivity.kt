@@ -1,5 +1,17 @@
 package com.sc19kb.android.chessapplication
 
+/*
+*------------ SIGN IN -------------
+*
+* Users come here after the splashscreen is displayed.
+*
+* This is where they need to sign in using
+* their Google Account.
+*
+* This login will be stored on the Google Firebase.
+*
+*/
+
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,7 +23,6 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.android.synthetic.main.activity_sign_in.*
-
 
 class SignInActivity : AppCompatActivity() {
 
@@ -85,5 +96,4 @@ class SignInActivity : AppCompatActivity() {
                 }
             }
     }
-
 }

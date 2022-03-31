@@ -6,19 +6,18 @@ package com.sc19kb.android.chessapplication
  * This is where the two users get directed after
  * joining the game match with the same name from the Lobby
  *
- * For now its only functionality is to change the colour
- * and number on a screen button every time the users click on it
+ * It makes use of the Chess Interface in order to utilise
+ * Chess Core and Chess Board and use them at once to realise
+ * the Online Chess Game.
  *
- * First user to click on it five (5) times is crowned the winner.
- *
- * Will be replaced by an actual chess game.
+ * It also maintains communication with the Firebase Realtime Database
+ * in order to post and retrieve moveStrings from either/both users
  *
  */
 
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -38,7 +37,7 @@ class OnlineGameActivity : AppCompatActivity(), ChessInterface {
     val database = FirebaseDatabase.getInstance().getReference("Matches")
     private lateinit var chessBoard: ChessBoard
     private var printWriter: PrintWriter? = null
-    var chessModel = ChessBoardConsole
+    var chessModel = ChessCore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +64,7 @@ class OnlineGameActivity : AppCompatActivity(), ChessInterface {
                     else endMatch(ChessArmy.BLACK, true)
 
                 }else{
-                    ChessBoardConsole.update(moveUpdateString)
+                    ChessCore.update(moveUpdateString)
                     if (chessModel.blackCheckMated) endMatch(ChessArmy.WHITE)
                     else if (chessModel.whiteCheckMated) endMatch(ChessArmy.BLACK)
                 }
@@ -79,7 +78,7 @@ class OnlineGameActivity : AppCompatActivity(), ChessInterface {
                     if (moveUpdateString == "Black Forfeited") endMatch(ChessArmy.WHITE, true)
                     else endMatch(ChessArmy.BLACK, true)
                 }else {
-                    ChessBoardConsole.update(moveUpdateString)
+                    ChessCore.update(moveUpdateString)
                     if (chessModel.blackCheckMated) endMatch(ChessArmy.WHITE)
                     else if (chessModel.whiteCheckMated) endMatch(ChessArmy.BLACK)
                 }
@@ -93,13 +92,13 @@ class OnlineGameActivity : AppCompatActivity(), ChessInterface {
     }
     // ===================================================================
     override fun pieceAt(col: Int, row: Int): ChessPiece? {
-        return ChessBoardConsole.pieceAt(col, row)
+        return ChessCore.pieceAt(col, row)
     }
 
     override fun movePiece(fromCol: Int, fromRow: Int, toCol: Int, toRow: Int) {
-        if( (isMatchMaker && ChessBoardConsole.round == ChessArmy.WHITE) || (!isMatchMaker && ChessBoardConsole.round == ChessArmy.BLACK) ){
+        if( (isMatchMaker && ChessCore.round == ChessArmy.WHITE) || (!isMatchMaker && ChessCore.round == ChessArmy.BLACK) ){
             Log.d(TAG, "$fromCol,$fromRow,$toCol,$toRow")
-            ChessBoardConsole.movePiece(fromCol, fromRow, toCol, toRow)
+            ChessCore.movePiece(fromCol, fromRow, toCol, toRow)
             chessBoard.invalidate()
 
             printWriter?.let {
@@ -119,14 +118,14 @@ class OnlineGameActivity : AppCompatActivity(), ChessInterface {
     // Sends the Move String to the Database
     private fun updateDatabase()
     {
-        database.child(matchName).child("Move String").setValue(ChessBoardConsole.moveString)
+        database.child(matchName).child("Move String").setValue(ChessCore.moveString)
         isMyMove = !isMyMove
     }
 
     // Resets the Chessboard to it's original form
     fun reset()
     {
-        ChessBoardConsole.reset()
+        ChessCore.reset()
 
         if(isMatchMaker){
             FirebaseDatabase.getInstance().reference.child("data").child(matchName).removeValue()
@@ -206,8 +205,8 @@ class OnlineGameActivity : AppCompatActivity(), ChessInterface {
     // Lets the forfeiting user know that they have lost due to leaving the match
     fun forfeitMatch() {
 
-        if (isMatchMaker) ChessBoardConsole.moveString = "White Forfeited"
-        else ChessBoardConsole.moveString = "Black Forfeited"
+        if (isMatchMaker) ChessCore.moveString = "White Forfeited"
+        else ChessCore.moveString = "Black Forfeited"
 
         updateDatabase()
 //

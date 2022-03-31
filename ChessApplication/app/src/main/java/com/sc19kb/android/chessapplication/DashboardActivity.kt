@@ -4,16 +4,15 @@ package com.sc19kb.android.chessapplication
 *------------ DASHBOARD -------------
 *
 * Users come here after Signing-in
-* in order to look at their profiles
-* and move the chess game
+* in order to take a look at their profiles
+* and move on to the Chess Game ( local or online )
+*
 */
 
 
-import android.content.DialogInterface
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -59,5 +58,4 @@ class DashboardActivity : AppCompatActivity() {
             finish()
         }
     }
-
 }
