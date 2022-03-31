@@ -1,10 +1,12 @@
 package com.sc19kb.android.chessapplication
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -174,4 +176,13 @@ class LobbyActivity : AppCompatActivity() {
         }
         return false
     }
+
+
+
+    override fun onBackPressed() {
+        startActivity(Intent(this, DashboardActivity::class.java))
+        finish()
+    }
+
+
 }

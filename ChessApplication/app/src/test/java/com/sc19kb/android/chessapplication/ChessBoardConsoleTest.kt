@@ -1,10 +1,7 @@
 package com.sc19kb.android.chessapplication
 
-import com.sc19kb.android.chessapplication.ChessBoardConsole
 import org.junit.Assert.*
 import org.junit.Test
-import kotlin.math.exp
-import kotlin.math.round
 
 class ChessBoardConsoleTest {
 
@@ -22,7 +19,7 @@ class ChessBoardConsoleTest {
     fun toString_isCorrect() {
         print("TESTING: toString_isCorrect() : ")
         val expected: String = "\n7 r h b q k b h r\n" + "6 p p p p p p p p\n" + "5 . . . . . . . .\n" + "4 . . . . . . . .\n" + "3 . . . . . . . .\n" + "2 . . . . . . . .\n" + "1 P P P P P P P P\n" + "0 R H B Q K B H R\n" + "  0 1 2 3 4 5 6 7"
-        val actual: String = ChessBoardConsole.toString()
+        val actual: String = ChessBoardConsole.boardToString()
        // println(ChessBoardConsole)
         assertEquals(expected,actual)
         println("PASS")
