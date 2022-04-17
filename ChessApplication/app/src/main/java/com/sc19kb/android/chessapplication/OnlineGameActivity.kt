@@ -90,7 +90,7 @@ class OnlineGameActivity : AppCompatActivity(), ChessInterface {
             }
         })
     }
-    // ===================================================================
+
     override fun pieceAt(col: Int, row: Int): ChessPiece? {
         return ChessCore.pieceAt(col, row)
     }
@@ -113,7 +113,6 @@ class OnlineGameActivity : AppCompatActivity(), ChessInterface {
         }
 
     }
-    // ===================================================================
 
     // Sends the Move String to the Database
     private fun updateDatabase()
@@ -209,18 +208,5 @@ class OnlineGameActivity : AppCompatActivity(), ChessInterface {
         else ChessCore.moveString = "Black Forfeited"
 
         updateDatabase()
-//
-//        val builder = AlertDialog.Builder(this)
-//        builder.setTitle("Forfeited")
-//        if(isMatchMaker) builder.setMessage("Black wins!")
-//        else builder.setMessage("White wins!")
-//
-//        builder.setPositiveButton("Leave"){dialogInterface: DialogInterface, i:Int ->
-//            chessModel.reset()
-//            chessModel.round = ChessArmy.WHITE
-//            startActivity(Intent(this , DashboardActivity::class.java))
-//            finish()
-//        }
-//        builder.show()
     }
 }
