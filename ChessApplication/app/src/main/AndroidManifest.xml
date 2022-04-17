@@ -15,10 +15,10 @@
             android:name=".LobbyActivity"
             android:exported="true" />
         <activity
-            android:name=".GameActivity"
+            android:name=".OnlineGameActivity"
             android:exported="true" />
         <activity
-            android:name=".MainGame"
+            android:name=".LocalGameActivity"
             android:exported="true" />
         <activity
             android:name=".DashboardActivity"

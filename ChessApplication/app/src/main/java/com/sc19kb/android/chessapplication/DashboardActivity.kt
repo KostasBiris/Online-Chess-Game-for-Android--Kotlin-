@@ -4,15 +4,18 @@ package com.sc19kb.android.chessapplication
 *------------ DASHBOARD -------------
 *
 * Users come here after Signing-in
-* in order to look at their profiles
-* and move the chess game
+* in order to take a look at their profiles
+* and move on to the Chess Game ( local or online )
+*
 */
 
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_dashboard.*
 
 class DashboardActivity : AppCompatActivity() {
@@ -26,7 +29,7 @@ class DashboardActivity : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
         val currentUser = mAuth.currentUser
 
-        // User Details
+        // User Details:
         // Id
         id_txt.text = currentUser?.uid
         // Name
@@ -34,24 +37,25 @@ class DashboardActivity : AppCompatActivity() {
         // Email
         email_txt.text = currentUser?.email
 
+
+        // Play Chess Online
+        play_online_btn.setOnClickListener {
+            startActivity(Intent(this , LobbyActivity::class.java))
+            finish()
+        }
+
+        // Play Chess Locally
+        play_local_btn.setOnClickListener {
+            startActivity(Intent(this , LocalGameActivity::class.java))
+            finish()
+        }
+
         // Sign-Out
         sign_out_btn.setOnClickListener {
-            mAuth.signOut()
+            Firebase.auth.signOut()
             val intent = Intent(this, SignInActivity::class.java)
             startActivity(intent)
             finish()
         }
-
-        // Play Chess
-        play_btn.setOnClickListener {
-            //startActivity(Intent(this , LobbyActivity::class.java))
-
-            //val MainGameIntent = Intent(this, MainGame::class.java)
-            startActivity(Intent(this , MainGame::class.java))
-            finish()
-        }
-
-
-
     }
 }

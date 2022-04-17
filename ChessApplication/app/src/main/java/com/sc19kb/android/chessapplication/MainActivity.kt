@@ -31,13 +31,6 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-////==============================================================================
-//        Log.d(TAG, "$chessModel")
-//
-//        val MainGameIntent = Intent(this, MainGame::class.java)
-//        startActivity(MainGameIntent)
-//        finish()
-////============================================================================
 
         mAuth = FirebaseAuth.getInstance()
         val user = mAuth.currentUser
