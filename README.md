@@ -23,3 +23,6 @@ To find the main files of the project's implementation, navigate to:
 
 To find the UI xml files of the project, navigate to:
 *"ChessApplication/app/src/main/res/layout"*
+
+To find the unit tests files of the projext, navigate to:
+*"ChessApplication/app/src/test/java/com/sc19kb/android/chessapplication"*
