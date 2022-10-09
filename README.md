@@ -1,4 +1,4 @@
-# COMP3931 Individual Project
+# Online Chess Game for Android devices, written in Kotlin
 
 Multi-player Mobile Chess Game for Android devices, using the Kotlin programming language.
 
